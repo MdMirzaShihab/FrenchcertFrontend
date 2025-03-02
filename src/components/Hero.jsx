@@ -7,7 +7,7 @@ const Hero = () => {
         <div className="container m-auto px-6 pt-32 md:px-12 lg:pt-[4.8rem] lg:px-7">
           <div className="flex items-center flex-wrap px-2 md:px-0">
             <div className="relative lg:w-8/12 lg:py-24 xl:py-32">
-              <div className="flex flex-col justify-center items-center lg:items-start">
+              <div className="flex flex-col justify-center items-center lg:items-start py-6">
                 <h1 className="text-blue-800 text-4xl md:text-6xl font-bold leading-tight text-center md:text-left">
                   Welcome To French Cert
                 </h1>

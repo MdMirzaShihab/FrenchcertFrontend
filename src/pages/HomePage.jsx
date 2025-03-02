@@ -8,7 +8,7 @@ const HomePage = () => {
       <Hero />
       {/* Our Services Section */}
       <div className="bg-blue-100 py-16">
-        <div className="container m-auto px-6 md:px-12 lg:px-7">
+        <div className="container m-auto flex flex-col items-center px-6 md:px-12 lg:px-7">
           {/* Section Title */}
           <h2 className="text-blue-800 text-4xl md:text-5xl font-bold text-center mb-8">
             Our Services
