@@ -6,7 +6,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-white h-16 text-gray-900 p-2 fixed w-full top-0 shadow-md z-50">
+    <nav className="bg-white h-16 text-blue-900 font-semibold p-2 fixed w-full top-0 shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center h-full object-cover">
         <Link to="/" className="h-full object-cover">
           <img src={logo} alt="Logo" className=" h-full object-cover" />
@@ -22,7 +22,7 @@ const Navbar = () => {
 
         {/* Desktop & Mobile Menu */}
         <ul
-          className={`absolute md:static md:flex items-center gap-6 md:space-x-6 px-6 py-4 md:p-0 top-14 right-0 w-full md:w-auto transform ${
+          className={`absolute md:static md:flex items-center gap-6 bg-white md:space-x-6 px-6 py-4 md:p-0 top-14 right-0 w-full md:w-auto transform ${
             isOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"
           } transition-transform duration-300 ease-in-out`}
         >
@@ -46,20 +46,11 @@ const Navbar = () => {
           </li>
           <li>
             <Link
-              to="/login"
+              to="/process"
               className="hover:text-blue-400 transition"
               onClick={() => setIsOpen(false)}
             >
-              Company Login
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/career"
-              className="hover:text-blue-400 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              Career
+              Process
             </Link>
           </li>
           <li>
@@ -82,11 +73,11 @@ const Navbar = () => {
           </li>
           <li>
             <Link
-              to="/contact"
+              to="/career"
               className="hover:text-blue-400 transition"
               onClick={() => setIsOpen(false)}
             >
-              Contact
+              Career
             </Link>
           </li>
           <li>
@@ -100,11 +91,20 @@ const Navbar = () => {
           </li>
           <li>
             <Link
-              to="/process"
+              to="/contact"
               className="hover:text-blue-400 transition"
               onClick={() => setIsOpen(false)}
             >
-              Process
+              Contact
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/login"
+              className="hover:text-blue-400 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              Company Login
             </Link>
           </li>
         </ul>
