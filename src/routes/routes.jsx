@@ -2,14 +2,26 @@ import { Routes, Route } from "react-router-dom";
 import Layout from "../components/Layout";
 import HomePage from "../pages/HomePage";
 import ValidateCertificate from "../pages/ValidateCertificate";
-import CompanyLogin from "../pages/CompanyLogin";
-import CompanyDetails from "../pages/CompanyDetails";
+import CompanyLogin from "../pages/Company Profile/CompanyLogin";
+import CompanyDetails from "../pages/Company Profile/CompanyDetails";
+import Career from "../pages/Career";
+import Services from "../pages/Services/Services";
+import About from "../pages/AboutUs/AboutUs";
+import Contact from "../pages/Contact/Contact";
+import JoinUs from "../pages/JoinUs/JoinUs";
+import Process from "../pages/Processes/Processes";
 
 const routes = [
   { path: "/", element: <HomePage /> },
   { path: "/validate", element: <ValidateCertificate /> },
   { path: "/login", element: <CompanyLogin /> },
   { path: "/company-details", element: <CompanyDetails /> },
+  { path: "/career", element: <Career /> },
+  { path: "/services", element: <Services /> },
+  { path: "/about", element: <About /> },
+  { path: "/contact", element: <Contact /> },
+  { path: "/join-us", element: <JoinUs /> },
+  { path: "/process", element: <Process /> },
 ];
 
 const AppRoutes = () => {

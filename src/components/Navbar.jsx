@@ -53,6 +53,60 @@ const Navbar = () => {
               Company Login
             </Link>
           </li>
+          <li>
+            <Link
+              to="/career"
+              className="hover:text-blue-400 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              Career
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/services"
+              className="hover:text-blue-400 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              Services
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/about"
+              className="hover:text-blue-400 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              About
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/contact"
+              className="hover:text-blue-400 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              Contact
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/join-us"
+              className="hover:text-blue-400 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              Join Us
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/process"
+              className="hover:text-blue-400 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              Process
+            </Link>
+          </li>
         </ul>
       </div>
     </nav>
