@@ -15,7 +15,7 @@ const routes = [
   { path: "/", element: <HomePage /> },
   { path: "/validate", element: <ValidateCertificate /> },
   { path: "/login", element: <CompanyLogin /> },
-  { path: "/company-details", element: <CompanyDetails /> },
+  { path: "/company-details/:companyID", element: <CompanyDetails /> }, 
   { path: "/career", element: <Career /> },
   { path: "/services", element: <Services /> },
   { path: "/about", element: <About /> },

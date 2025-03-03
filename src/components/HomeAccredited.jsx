@@ -48,7 +48,7 @@ const HomeAccredited = () => {
             <img
               src={cert}
               alt="3D Certificate"
-              className="w-full h-full object-contain "
+              className="w-full h-full object-contain animate-upDown"
             />
           </div>
         </div>
