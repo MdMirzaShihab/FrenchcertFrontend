@@ -1,4 +1,5 @@
 import Hero from "../components/Hero";
+import HomeAccredited from "../components/HomeAccredited";
 import HomeServices from "../components/HomeServices";
 
 
@@ -7,7 +8,7 @@ const HomePage = () => {
     <div>
       <Hero />
       <HomeServices />
-     
+      <HomeAccredited />
     </div>
   );
 };

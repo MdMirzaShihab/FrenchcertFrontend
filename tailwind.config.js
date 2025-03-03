@@ -20,4 +20,13 @@ export default {
     },
   },
   plugins: [],
+  safelist: [
+    // Safelist all color-related classes
+    { pattern: /bg-(blue|green|red|yellow|purple|pink|indigo)-(100|200|300|400|500|600|700|800|900)/ },
+    { pattern: /text-(blue|green|red|yellow|purple|pink|indigo)-(100|200|300|400|500|600|700|800|900)/ },
+    { pattern: /border-(blue|green|red|yellow|purple|pink|indigo)-(100|200|300|400|500|600|700|800|900)/ },
+    { pattern: /shadow-(blue|green|red|yellow|purple|pink|indigo)-(100|200|300|400|500|600|700|800|900)/ },
+    { pattern: /from-(blue|green|red|yellow|purple|pink|indigo)-(100|200|300|400|500|600|700|800|900)/ },
+    { pattern: /to-(blue|green|red|yellow|purple|pink|indigo)-(100|200|300|400|500|600|700|800|900)/ },
+  ],
 };

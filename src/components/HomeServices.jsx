@@ -1,36 +1,35 @@
 import React, { useState } from "react";
-import ServiceCard from "../components/ServiceCard";
-import ServicesReadMore from "../components/ServicesReadMore"; // Import the popup component
-import { servicesData } from "../constants/servicesData";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css"; 
+import "swiper/css/navigation"; 
+import ServiceCard from "./DisplayCard";
+import ServicesReadMore from "./ReadMoreDisplayCard";
+import { servicesData } from "../constants/staticData";
 
 const HomeServices = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedService, setSelectedService] = useState(null); // Track which service's popup is open
+  const [selectedService, setSelectedService] = useState(null);
 
-  // Filter services based on search query
   const filteredServices = servicesData.filter((service) =>
     service.serviceName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Handle opening the popup
   const handleReadMore = (service) => {
     setSelectedService(service);
   };
 
-  // Handle closing the popup
   const handleClosePopup = () => {
     setSelectedService(null);
   };
 
   return (
     <div className="bg-blue-100 py-16">
-      <div className="container m-auto flex flex-col items-center px-6 md:px-12 lg:px-7">
-        {/* Section Title */}
+      <div className="m-auto flex flex-col items-center px-6 md:px-12 lg:px-7">
         <h2 className="text-blue-800 text-4xl md:text-5xl font-bold text-center mb-8">
           Our Services
         </h2>
 
-        {/* Search Bar */}
         <div className="w-full max-w-md mb-8">
           <input
             type="text"
@@ -41,28 +40,40 @@ const HomeServices = () => {
           />
         </div>
 
-        {/* Horizontally Scrollable Services Container */}
-        <div className="w-full overflow-x-auto py-4 pb-16">
-          <div className="flex gap-8" style={{ minWidth: `${filteredServices.length * 320}px` }}>
+        {/* Swiper Slider with Navigation Arrows */}
+        <div className="w-full px-10 relative">
+          <Swiper
+            spaceBetween={30}
+            slidesPerView={3}
+            navigation={true} 
+            modules={[Navigation]} 
+            breakpoints={{
+              320: { slidesPerView: 1 },
+              768: { slidesPerView: 3 },
+              1024: { slidesPerView: 5 },
+            }}>
             {filteredServices.map((service) => (
-              <div key={service.serviceID} className="flex-shrink-0 w-[300px]">
+              <SwiperSlide
+                key={service.serviceID}
+                className="py-12 px-6">
                 <ServiceCard
-                  serviceName={service.serviceName}
-                  serviceDescription={service.serviceDescription}
-                  onReadMore={() => handleReadMore(service)} 
+                  displayName={service.serviceName}
+                  displayDescription={service.serviceDescription}
+                  onReadMore={() => handleReadMore(service)}
+                  color="blue"
                 />
-              </div>
+              </SwiperSlide>
             ))}
-          </div>
+          </Swiper>
         </div>
       </div>
 
-      {/* Render the Popup Outside the Scrollable Container */}
       {selectedService && (
         <ServicesReadMore
-          serviceName={selectedService.serviceName}
-          serviceDescription={selectedService.serviceDescription}
+          displayName={selectedService.serviceName}
+          displayDescription={selectedService.serviceDescription}
           onClose={handleClosePopup}
+          color="blue"
         />
       )}
     </div>
