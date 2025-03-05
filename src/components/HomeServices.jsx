@@ -27,7 +27,7 @@ const HomeServices = () => {
     <div className="bg-blue-100 py-16">
       <div className="m-auto flex flex-col items-center px-6 md:px-12 lg:px-7">
         <h2 className="text-blue-800 text-4xl md:text-5xl font-bold text-center mb-8">
-          Our Services
+        Certification of Management Systems
         </h2>
 
         <div className="w-full max-w-md mb-8">

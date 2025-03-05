@@ -1,63 +1,57 @@
 const servicesData = [
   {
     serviceID: 1,
-    serviceName: "ISO 9001:2015",
+    serviceName: "ISO 9001",
     serviceDescription:
       "Looking at the currently available version of the standard, some of the anticipated overarching benefits are listed below. However, what we do know is that this revision to ISO 9001 is bringing the requirements up-to-date with good management practice; a lot has changed in 15 years since the last significant revision to ISO 9001.",
   },
   {
     serviceID: 2,
-    serviceName: "ISO 14001:2015",
+    serviceName: "ISO 14001",
     serviceDescription:
       "ISO 14001:2015 specifies the requirements for a management system that an organization can use to enhance its environmental performance. ISO 14001:2015 is intended for use by an organization seeking to manage its environmental responsibilities in a systematic manner that contributes to the environmental pillar of sustainability.",
   },
   {
     serviceID: 3,
-    serviceName: "OHSAS 18001:2007",
+    serviceName: "ISO 27001",
     serviceDescription:
       "OHSAS 18001:2007 Certification, AB-CAB, AB-CAB Accredited Certification Body, ABCAB, ABCAB Accreditation, ABCAB Accreditation Services, ABCAB Accredited Certificate, become partner for ISO Marketing, How to get brnach of Certificaiton Body, franchisee for ISO Certification Body, TNVUK, TNV-UK, TNV Certification UK Ltd.",
   },
   {
     serviceID: 4,
-    serviceName: "ISO 22000:2018",
+    serviceName: "ISO 22000",
     serviceDescription:
       "Food Safety means adequate controls on presence of food based hazards in food at the time of its consumptions. Food safety is not single stage controls but is combined efforts of all the party participating in the food chain, this includes Feed Producers, Primary Producers through manufacturer, Transporter, Store operator, wholesalers, retailers, Caterers, Food Service Outlets and Producers of Equipments, Packaging Materials, Cleaning Agents, Additives & preservatives & Ingredients and Service providers. Even this includes Pesticides, fertilizers and veterinary drugs. Successful Implementation of FSMS helps the organisation to prevent problems like presence of Microbes, Toxins and Adulteration etc before its occurrence & Suggest Corrective action.",
   },
   {
     serviceID: 5,
-    serviceName: "ISO 20000",
+    serviceName: "FSSC 22000",
     serviceDescription:
       "ISO/IEC 20000 is the international standard for IT Service Management (ITSM), providing a framework for organizations to establish, implement, maintain, and continually improve an IT service management system (SMS). It ensures effective delivery of high-quality IT services aligned with business and customer needs, incorporating best practices often aligned with ITIL (Information Technology Infrastructure Library). The standard emphasizes customer focus, continuous improvement, and efficient service delivery through processes like service level management, incident management, change management, and supplier management. By adopting ISO 20000, organizations can enhance service quality, improve operational efficiency, manage risks, and demonstrate a commitment to excellence, gaining a competitive edge through internationally recognized certification. It is applicable to organizations of all sizes and industries, offering a structured approach to managing IT services effectively.",
   },
   {
     serviceID: 6,
-    serviceName: "ISO 27001:2013",
+    serviceName: "ISO 45001",
     serviceDescription:
       "ISO/IEC 27001:2013 is the international standard for Information Security Management Systems (ISMS), providing a systematic framework for managing sensitive information and ensuring its confidentiality, integrity, and availability. It helps organizations identify, assess, and mitigate information security risks through a risk-based approach, ensuring robust protection of data assets. The standard emphasizes continuous improvement and compliance with legal, regulatory, and contractual requirements. By implementing ISO 27001, organizations can enhance their security posture, build trust with stakeholders, and demonstrate a commitment to safeguarding information. Certification to ISO 27001 is globally recognized and applicable to organizations of all sizes and sectors, offering a structured methodology to manage information security risks effectively.",
   },
   {
     serviceID: 7,
-    serviceName: "ISO 13485:2016",
+    serviceName: "ISO 50001",
     serviceDescription:
       "ISO 13485:2016 is the international standard for Quality Management Systems (QMS) specific to the medical device industry. It provides a framework for organizations to design, develop, produce, install, and service medical devices while ensuring compliance with regulatory requirements and consistently meeting customer and regulatory expectations. The standard emphasizes risk management, traceability, and continuous improvement throughout the product lifecycle. By implementing ISO 13485, organizations can enhance product quality, ensure patient safety, and facilitate regulatory approvals in global markets. Certification to ISO 13485 is widely recognized and demonstrates a commitment to maintaining high standards in the design and manufacture of medical devices, making it essential for manufacturers, suppliers, and distributors in the healthcare sector.",
   },
   {
     serviceID: 8,
-    serviceName: "IFS",
+    serviceName: "IATF 16949",
     serviceDescription:
       "Food  safety today is one of the most important things for food producer and for  the final consumers on the market. Consumer concern about treats associated with  food is growing and the food quality and food safety has become major issue in media and in the public in the recent years. Production and sale of food with suitable quality  is fundamental element of gaining confidence of consumers on every market. Companies which offer and sell their products on the market are changing their  behavior regarding food safety and trying to implement every standard market is International food  standard and food safety supply chain managements.",
   },
   {
     serviceID: 9,
-    serviceName: "BRC Compliance",
+    serviceName: "EN 9100 / EN 9120",
     serviceDescription:
       "BRC (British Retail Consortium) Global Standard for Food Safety The BRC (British Retail Consortium) Global Standard has been created to establish a standard for the supply of food products and to act as a key piece of evidence for retailers, and the brand owners to demonstrate due diligence' in the face of potential prosecution by the enforcement authoritiesAchieving certification against the BRC Global Standard for Food Safety proves your level of competence in HACPP, hygiene, food safety and quality systems. At the same time it demonstrates your commitment to consumer safety and stakeholder relations. We are approved by the BRC to offer certification audits and as the world’s leading inspection, verification, testing and certification company, we have the global network to offer this service wherever you are based. BRC Global Standard for Packaging and Packaging Materials and the BRC Global Standard for Storage and Distribution.",
-  },
-  {
-    serviceID: 10,
-    serviceName: "ISO 22301:2012",
-    serviceDescription:
-      "ISO 22301:2012 is the international standard for Business Continuity Management Systems (BCMS), providing a framework for organizations to prepare for, respond to, and recover from disruptive incidents. It ensures the continuity of critical business operations during emergencies such as natural disasters, cyberattacks, or supply chain disruptions. The standard emphasizes risk assessment, planning, and testing to minimize downtime and maintain resilience. By implementing ISO 22301, organizations can protect their reputation, meet regulatory and customer expectations, and ensure the availability of essential services. Certification to ISO 22301 demonstrates a commitment to operational resilience and is applicable to organizations of all sizes and industries, offering a structured approach to safeguarding business continuity in the face of disruptions.",
   },
 ];
 
@@ -129,18 +123,21 @@ const companiesData = [
     certifications: [
       {
         certificationID: "CERT-001",
+        serviceID: 1,
         certificationName: "ISO 9001:2015",
         issueDate: "2022-07-15",
         expiryDate: "2025-07-15",
       },
       {
         certificationID: "CERT-002",
+        serviceID: 3,
         certificationName: "ISO 27001:2013",
         issueDate: "2022-05-20",
         expiryDate: "2025-05-20",
       },
       {
         certificationID: "CERT-003",
+        serviceID: 4,
         certificationName: "ISO 22000:2018",
         issueDate: "2021-11-20",
         expiryDate: "2024-11-20",
@@ -179,6 +176,7 @@ const companiesData = [
     certifications: [
       {
         certificationID: "CERT-004",
+        serviceID: 2,
         certificationName: "ISO 14001:2015",
         issueDate: "2023-02-10",
         expiryDate: "2026-02-10",
@@ -212,6 +210,7 @@ const companiesData = [
     certifications: [
       {
         certificationID: "CERT-005",
+        serviceID: 3,
         certificationName: "ISO 27001:2013",
         issueDate: "2022-09-05",
         expiryDate: "2025-09-05",

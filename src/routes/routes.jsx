@@ -12,6 +12,9 @@ import JoinUs from "../pages/JoinUs/JoinUs";
 import Process from "../pages/Processes/Processes";
 import Accreditations from "../pages/Accreditations/Accreditations";
 
+
+import ISO9001 from "../pages/Services/ISO9001"
+
 const routes = [
   { path: "/", element: <HomePage /> },
   { path: "/validate", element: <ValidateCertificate /> },
@@ -24,6 +27,7 @@ const routes = [
   { path: "/contact", element: <Contact /> },
   { path: "/join-us", element: <JoinUs /> },
   { path: "/process", element: <Process /> },
+  { path: "/iso9001", element: <ISO9001 /> },
 ];
 
 const AppRoutes = () => {
