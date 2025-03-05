@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/Frenchcert.png";
+import logo from "../assets/FrenchcertABcab.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-white h-16 text-blue-900 font-semibold p-2 fixed w-full top-0 shadow-md z-50">
+    <nav className="bg-white h-24 text-blue-900 font-semibold p-2 fixed w-full top-0 shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center h-full object-cover">
         <Link to="/" className="h-full object-cover">
           <img src={logo} alt="Logo" className=" h-full object-cover" />

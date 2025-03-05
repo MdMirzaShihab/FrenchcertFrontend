@@ -9,7 +9,7 @@ const Layout = () => {
       <Navbar />
 
       {/* Main content with margin to avoid overlap with Navbar */}
-      <main className="mt-16">
+      <main className="mt-24">
         <Outlet /> {/* This renders the active page inside Layout */}
       </main>
 
