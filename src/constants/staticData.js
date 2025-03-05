@@ -64,39 +64,33 @@ const servicesData = [
 const accreditationData = [
   {
     accreditationID: 1,
-    accreditationName: "ABC-AB Accredited",
+    accreditationName: "AB-CAB Accredited",
     accreditationDescription:
-      "Accreditation Board for Conformity Assessment Bodies (AB-CAB) is an Independent, International Accreditation Board (AB). It works to serve the global communities of businesses and consumers. AB-CAB accredits appropriately qualified independent third party Conformity Assessment Bodies (CABs) such as Certification Bodies, Inspection Bodies, Testing & Calibration Laboratories and Medical Laboratories to ensure that their competence to carry out specific tasks is as per the International Standards & the Benchmarks. AB-CAB Accreditation is voluntary in nature. AB-CAB is a trading name for “Accreditation Board For Conformity Assessment Bodies” a company limited by shares established as per requirement of , Republic of India. AB-CAB operates in accordance with the requirements, criteria, rules and regulations laid down in the following documents: The requirements of the international standard ISO/IEC 17011, General requirements for bodies providing assessments and accreditation of conformity assessment bodiesThe requirements and other benchmarks as stipulated in the Publicly Available Documents (PAD) published by various international bodies and ABCAB Legally established objectives. The authority vested is ABCAB is that assigned to them by the Conformity Assessment Bodies and other Organization it accredits and recognizes by virtue of these applicant and accredited bodies pledging support for the mission and objectives of AB-CAB and ensuring that their actions are according to that policy. It is an independent, impartial and non-governmental body and makes no claim to be connected with any government.yy",
+      "Accreditation Board for Conformity Assessment Bodies (AB-CAB) is an Independent, International Accreditation Board (AB). It works to serve the global communities of businesses and consumers. AB-CAB accredits appropriately qualified independent third party Conformity Assessment Bodies (CABs) such as Certification Bodies, Inspection Bodies, Testing & Calibration Laboratories and Medical Laboratories to ensure that their competence to carry out specific tasks is as per the International Standards & the Benchmarks. AB-CAB Accreditation is voluntary in nature. AB-CAB is a trading name for “Accreditation Board For Conformity Assessment Bodies” a company limited by shares established as per requirement of , Republic of India. AB-CAB operates in accordance with the requirements, criteria, rules and regulations laid down in the following documents: The requirements of the international standard ISO/IEC 17011, General requirements for bodies providing assessments and accreditation of conformity assessment bodiesThe requirements and other benchmarks as stipulated in the Publicly Available Documents (PAD) published by various international bodies and ABCAB Legally established objectives. The authority vested is ABCAB is that assigned to them by the Conformity Assessment Bodies and other Organization it accredits and recognizes by virtue of these applicant and accredited bodies pledging support for the mission and objectives of AB-CAB and ensuring that their actions are according to that policy. It is an independent, impartial and non-governmental body and makes no claim to be connected with any government.",
   },
   {
     accreditationID: 2,
-    accreditationName: "ABC-AB Accredited",
+    accreditationName: "ISO 17020 Accredited",
     accreditationDescription:
-      "Accreditation Board for Conformity Assessment Bodies (AB-CAB) is an Independent, International Accreditation Board (AB). It works to serve the global communities of businesses and consumers. AB-CAB accredits appropriately qualified independent third party Conformity Assessment Bodies (CABs) such as Certification Bodies, Inspection Bodies, Testing & Calibration Laboratories and Medical Laboratories to ensure that their competence to carry out specific tasks is as per the International Standards & the Benchmarks. AB-CAB Accreditation is voluntary in nature. AB-CAB is a trading name for “Accreditation Board For Conformity Assessment Bodies” a company limited by shares established as per requirement of , Republic of India. AB-CAB operates in accordance with the requirements, criteria, rules and regulations laid down in the following documents: The requirements of the international standard ISO/IEC 17011, General requirements for bodies providing assessments and accreditation of conformity assessment bodiesThe requirements and other benchmarks as stipulated in the Publicly Available Documents (PAD) published by various international bodies and ABCAB Legally established objectives. The authority vested is ABCAB is that assigned to them by the Conformity Assessment Bodies and other Organization it accredits and recognizes by virtue of these applicant and accredited bodies pledging support for the mission and objectives of AB-CAB and ensuring that their actions are according to that policy. It is an independent, impartial and non-governmental body and makes no claim to be connected with any government.yy",
+      "Accreditation to ISO/IEC 17020, Conformity assessment - Requirements for the operation of various types of bodies performing inspection, is gaining momentum in industries around the globe. The broad definition of inspection in the standard allows great flexibility in application from systems to services and raw material to finished products.ISO/IEC 17020 incorporates same level of requirements for the organizational quality management system as ISO 9001 and ISO/IEC 17000 series standards such as ISO/IEC 17021, Conformity assessment - Requirements for bodies providing audit and certification of management systems, and ISO/IEC 17065, Conformity assessment -- Requirements for bodies certifying products, processes and services. ISO/IEC 17020, however, puts greater emphasis on organizational ability to manage impartiality and conflicts of interest as well as the technical competence of people, inspection processes, and equipment. Accredited inspection provides assurance of technically competent service and consistently reliable results, reducing costs and lowering risks. It is key in demonstrating that products, equipment, structures, and systems meet required specifications. Governments and industries around the world are increasingly requiring use of accredited inspection services. AB-CAB accreditation to ISO/IEC 17020 allows an organization to demonstrate integrity, reliability, and technical competence as well as compliance internationally recognized good practices.",
   },
   {
     accreditationID: 3,
-    accreditationName: "ABC-AB Accredited",
+    accreditationName: "ISO 17021 Accredited",
     accreditationDescription:
-      "Accreditation Board for Conformity Assessment Bodies (AB-CAB) is an Independent, International Accreditation Board (AB). It works to serve the global communities of businesses and consumers. AB-CAB accredits appropriately qualified independent third party Conformity Assessment Bodies (CABs) such as Certification Bodies, Inspection Bodies, Testing & Calibration Laboratories and Medical Laboratories to ensure that their competence to carry out specific tasks is as per the International Standards & the Benchmarks. AB-CAB Accreditation is voluntary in nature. AB-CAB is a trading name for “Accreditation Board For Conformity Assessment Bodies” a company limited by shares established as per requirement of , Republic of India. AB-CAB operates in accordance with the requirements, criteria, rules and regulations laid down in the following documents: The requirements of the international standard ISO/IEC 17011, General requirements for bodies providing assessments and accreditation of conformity assessment bodiesThe requirements and other benchmarks as stipulated in the Publicly Available Documents (PAD) published by various international bodies and ABCAB Legally established objectives. The authority vested is ABCAB is that assigned to them by the Conformity Assessment Bodies and other Organization it accredits and recognizes by virtue of these applicant and accredited bodies pledging support for the mission and objectives of AB-CAB and ensuring that their actions are according to that policy. It is an independent, impartial and non-governmental body and makes no claim to be connected with any government.yy",
+      "Accreditation Board for Conformity Assessment Bodies (AB-CAB) is an Independent, International Accreditation Board (AB). It works to serve the global communities of businesses and consumers. AB-CAB accredits appropriately qualified independent third party Conformity Assessment Bodies (CABs) such as Certification Bodies, Inspection Bodies, Testing & Calibration Laboratories and Medical Laboratories to ensure that their competence to carry out specific tasks is as per the International Standards & the Benchmarks. AB-CAB Accreditation is voluntary in nature. AB-CAB is a trading name for “Accreditation Board For Conformity Assessment Bodies” a company limited by shares established as per requirement of , Republic of India. AB-CAB operates in accordance with the requirements, criteria, rules and regulations laid down in the following documents: The requirements of the international standard ISO/IEC 17011, General requirements for bodies providing assessments and accreditation of conformity assessment bodiesThe requirements and other benchmarks as stipulated in the Publicly Available Documents (PAD) published by various international bodies and AB-CAB a Legally established objectives as per its by-laws.The authority vested is AB-CAB is that assigned to them by the Conformity Assessment Bodies and other Organization it accredits and recognizes by virtue of these applicant and accredited bodies pledging support for the mission and objectives of AB-CAB and ensuring that their actions are according to that policy. It is an independent, impartial and non-governmental body and makes no claim to be connected with any government.",
   },
   {
     accreditationID: 4,
-    accreditationName: "ABC-AB Accredited",
+    accreditationName: "Industry Accreditation",
     accreditationDescription:
-      "Accreditation Board for Conformity Assessment Bodies (AB-CAB) is an Independent, International Accreditation Board (AB). It works to serve the global communities of businesses and consumers. AB-CAB accredits appropriately qualified independent third party Conformity Assessment Bodies (CABs) such as Certification Bodies, Inspection Bodies, Testing & Calibration Laboratories and Medical Laboratories to ensure that their competence to carry out specific tasks is as per the International Standards & the Benchmarks. AB-CAB Accreditation is voluntary in nature. AB-CAB is a trading name for “Accreditation Board For Conformity Assessment Bodies” a company limited by shares established as per requirement of , Republic of India. AB-CAB operates in accordance with the requirements, criteria, rules and regulations laid down in the following documents: The requirements of the international standard ISO/IEC 17011, General requirements for bodies providing assessments and accreditation of conformity assessment bodiesThe requirements and other benchmarks as stipulated in the Publicly Available Documents (PAD) published by various international bodies and ABCAB Legally established objectives. The authority vested is ABCAB is that assigned to them by the Conformity Assessment Bodies and other Organization it accredits and recognizes by virtue of these applicant and accredited bodies pledging support for the mission and objectives of AB-CAB and ensuring that their actions are according to that policy. It is an independent, impartial and non-governmental body and makes no claim to be connected with any government.yy",
+      "AB-CAB provide accredaiton for Industry-Specific Accreditation and TNV have plan to apply for accreditation for the following: cGMP/GMP, EPA Energy Star, Hotel Star Rating, Food Test, TNI Environmental, Maturity Level, Green Certification, HALAL",
   },
   {
     accreditationID: 5,
-    accreditationName: "ABC-AB Accredited",
+    accreditationName: "ISO 15189 Accreditation",
     accreditationDescription:
-      "Accreditation Board for Conformity Assessment Bodies (AB-CAB) is an Independent, International Accreditation Board (AB). It works to serve the global communities of businesses and consumers. AB-CAB accredits appropriately qualified independent third party Conformity Assessment Bodies (CABs) such as Certification Bodies, Inspection Bodies, Testing & Calibration Laboratories and Medical Laboratories to ensure that their competence to carry out specific tasks is as per the International Standards & the Benchmarks. AB-CAB Accreditation is voluntary in nature. AB-CAB is a trading name for “Accreditation Board For Conformity Assessment Bodies” a company limited by shares established as per requirement of , Republic of India. AB-CAB operates in accordance with the requirements, criteria, rules and regulations laid down in the following documents: The requirements of the international standard ISO/IEC 17011, General requirements for bodies providing assessments and accreditation of conformity assessment bodiesThe requirements and other benchmarks as stipulated in the Publicly Available Documents (PAD) published by various international bodies and ABCAB Legally established objectives. The authority vested is ABCAB is that assigned to them by the Conformity Assessment Bodies and other Organization it accredits and recognizes by virtue of these applicant and accredited bodies pledging support for the mission and objectives of AB-CAB and ensuring that their actions are according to that policy. It is an independent, impartial and non-governmental body and makes no claim to be connected with any government.yy",
-  },
-  {
-    accreditationID: 5,
-    accreditationName: "ABC-AB Accredited",
-    accreditationDescription:
-      "Accreditation Board for Conformity Assessment Bodies (AB-CAB) is an Independent, International Accreditation Board (AB). It works to serve the global communities of businesses and consumers. AB-CAB accredits appropriately qualified independent third party Conformity Assessment Bodies (CABs) such as Certification Bodies, Inspection Bodies, Testing & Calibration Laboratories and Medical Laboratories to ensure that their competence to carry out specific tasks is as per the International Standards & the Benchmarks. AB-CAB Accreditation is voluntary in nature. AB-CAB is a trading name for “Accreditation Board For Conformity Assessment Bodies” a company limited by shares established as per requirement of , Republic of India. AB-CAB operates in accordance with the requirements, criteria, rules and regulations laid down in the following documents: The requirements of the international standard ISO/IEC 17011, General requirements for bodies providing assessments and accreditation of conformity assessment bodiesThe requirements and other benchmarks as stipulated in the Publicly Available Documents (PAD) published by various international bodies and ABCAB Legally established objectives. The authority vested is ABCAB is that assigned to them by the Conformity Assessment Bodies and other Organization it accredits and recognizes by virtue of these applicant and accredited bodies pledging support for the mission and objectives of AB-CAB and ensuring that their actions are according to that policy. It is an independent, impartial and non-governmental body and makes no claim to be connected with any government.yy",
+      "TNV UK is not yet accredited for this but plan to apply accrediaiton to AB-CAB for ISO 15189 Medical Lab Accreditation in year 2017.",
   },
 ];
 
@@ -126,6 +120,8 @@ const companiesData = [
     companyID: 1,
     companyName: "Tech Solutions LTD.",
     companyOrigin: "Bangladesh",
+    validity: "Valid",
+    companyCategory: "Tech",
     companyEmail: "info@techsolutions.com",
     companyPhone: "+1 (123) 456-7890",
     companyAddress: "123 Tech Street, Silicon Valley, CA, USA",
@@ -134,16 +130,20 @@ const companiesData = [
       {
         certificationID: "CERT-001",
         certificationName: "ISO 9001:2015",
-        issueDate: "2022-01-15",
-        expiryDate: "2025-01-15",
-        validity: "Valid",
+        issueDate: "2022-07-15",
+        expiryDate: "2025-07-15",
       },
       {
         certificationID: "CERT-002",
         certificationName: "ISO 27001:2013",
+        issueDate: "2022-05-20",
+        expiryDate: "2025-05-20",
+      },
+      {
+        certificationID: "CERT-003",
+        certificationName: "ISO 22000:2018",
         issueDate: "2021-11-20",
         expiryDate: "2024-11-20",
-        validity: "Valid",
       },
     ],
     trainings: [
@@ -161,10 +161,9 @@ const companiesData = [
     accreditations: [
       {
         accreditationID: 1,
-        accreditationName: "ABC-AB Accredited",
+        accreditationName: "AB-CAB Accredited",
         issueDate: "2022-05-01",
         expiryDate: "2025-05-01",
-        validity: "Valid",
       },
     ],
   },
@@ -172,17 +171,17 @@ const companiesData = [
     companyID: 2,
     companyName: "Green Earth Ltd.",
     companyOrigin: "Bangladesh",
+    companyCategory: "Tech",
     companyEmail: "contact@greenearth.com",
     companyPhone: "+1 (234) 567-8901",
     companyAddress: "456 Eco Road, Green City, NY, USA",
     password: "green456",
     certifications: [
       {
-        certificationID: "CERT-003",
+        certificationID: "CERT-004",
         certificationName: "ISO 14001:2015",
         issueDate: "2023-02-10",
         expiryDate: "2026-02-10",
-        validity: "Valid",
       },
     ],
     trainings: [
@@ -195,10 +194,9 @@ const companiesData = [
     accreditations: [
       {
         accreditationID: 2,
-        accreditationName: "XYZ Accreditation",
+        accreditationName: "Industry Accreditation",
         issueDate: "2023-03-15",
         expiryDate: "2026-03-15",
-        validity: "Valid",
       },
     ],
   },
@@ -206,13 +204,14 @@ const companiesData = [
     companyID: 3,
     companyName: "Secure Systems Sdn. Bhd.",
     companyOrigin: "Malaysia",
+    companyCategory: "Tech",
     companyEmail: "support@securesystems.com",
     companyPhone: "+1 (345) 678-9012",
     companyAddress: "789 Security Blvd, Cyber City, TX, USA",
     password: "secure789",
     certifications: [
       {
-        certificationID: "CERT-004",
+        certificationID: "CERT-005",
         certificationName: "ISO 27001:2013",
         issueDate: "2022-09-05",
         expiryDate: "2025-09-05",
@@ -229,10 +228,9 @@ const companiesData = [
     accreditations: [
       {
         accreditationID: 1,
-        accreditationName: "ABC-AB Accredited",
+        accreditationName: "ISO 15189 Accreditation",
         issueDate: "2022-10-01",
         expiryDate: "2025-10-01",
-        validity: "Valid",
       },
     ],
   },

@@ -10,12 +10,14 @@ import About from "../pages/AboutUs/AboutUs";
 import Contact from "../pages/Contact/Contact";
 import JoinUs from "../pages/JoinUs/JoinUs";
 import Process from "../pages/Processes/Processes";
+import Accreditations from "../pages/Accreditations/Accreditations";
 
 const routes = [
   { path: "/", element: <HomePage /> },
   { path: "/validate", element: <ValidateCertificate /> },
   { path: "/login", element: <CompanyLogin /> },
   { path: "/company-details/:companyID", element: <CompanyDetails /> }, 
+  { path: "/accreditations", element: <Accreditations /> }, 
   { path: "/career", element: <Career /> },
   { path: "/services", element: <Services /> },
   { path: "/about", element: <About /> },
