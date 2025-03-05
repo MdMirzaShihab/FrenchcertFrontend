@@ -1,5 +1,9 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 import { companiesData, servicesData, trainingData, accreditationData } from "../../constants/staticData";
 
 const CompanyDetails = () => {
@@ -30,11 +34,11 @@ const CompanyDetails = () => {
   );
 
   const trainingSuggestions = trainingData.filter(training =>
-    !company.trainings.some(t => t.trainingName === training.trainingName)
+    !company.trainings.some(t => t.trainingID === training.trainingID)
   );
 
   const accreditationSuggestions = accreditationData.filter(acc =>
-    !company.accreditations.some(a => a.accreditationName === acc.accreditationName)
+    !company.accreditations.some(a => a.accreditationID === acc.accreditationID)
   );
 
   return (
@@ -101,17 +105,29 @@ const CompanyDetails = () => {
           {certificateSuggestions.length > 0 && (
             <div className="mt-8">
               <h3 className="text-xl font-bold text-blue-700 mb-4">Suggested Certifications</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Swiper
+                modules={[Navigation, Autoplay]}
+                navigation
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                spaceBetween={20}
+                slidesPerView={1}
+                breakpoints={{
+                  640: { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+                }}
+              >
                 {certificateSuggestions.map((service) => (
-                  <div key={service.serviceID} className="bg-gray-50 p-4 rounded-lg shadow-md">
-                    <h3 className="text-xl font-bold text-gray-800">{service.serviceName}</h3>
-                    <p className="text-gray-600 text-sm mt-2">{service.serviceDescription.slice(0, 100)}...</p>
-                    <button className="mt-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-300">
-                      Learn More
-                    </button>
-                  </div>
+                  <SwiperSlide key={service.serviceID}>
+                    <div className="bg-gray-50 p-4 rounded-lg shadow-md">
+                      <h3 className="text-xl font-bold text-gray-800">{service.serviceName}</h3>
+                      <p className="text-gray-600 text-sm mt-2">{service.serviceDescription.slice(0, 100)}...</p>
+                      <button className="mt-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-300">
+                        Learn More
+                      </button>
+                    </div>
+                  </SwiperSlide>
                 ))}
-              </div>
+              </Swiper>
             </div>
           )}
         </div>
@@ -132,17 +148,29 @@ const CompanyDetails = () => {
           {trainingSuggestions.length > 0 && (
             <div className="mt-8">
               <h3 className="text-xl font-bold text-green-700 mb-4">Suggested Trainings</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Swiper
+                modules={[Navigation, Autoplay]}
+                navigation
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                spaceBetween={20}
+                slidesPerView={1}
+                breakpoints={{
+                  640: { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+                }}
+              >
                 {trainingSuggestions.map((training) => (
-                  <div key={training.trainingID} className="bg-gray-50 p-4 rounded-lg shadow-md">
-                    <h3 className="text-xl font-bold text-gray-800">{training.trainingName}</h3>
-                    <p className="text-gray-600 text-sm mt-2">{training.trainingDescription.slice(0, 100)}...</p>
-                    <button className="mt-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-300">
-                      Learn More
-                    </button>
-                  </div>
+                  <SwiperSlide key={training.trainingID}>
+                    <div className="bg-gray-50 p-4 rounded-lg shadow-md">
+                      <h3 className="text-xl font-bold text-gray-800">{training.trainingName}</h3>
+                      <p className="text-gray-600 text-sm mt-2">{training.trainingDescription.slice(0, 100)}...</p>
+                      <button className="mt-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-300">
+                        Learn More
+                      </button>
+                    </div>
+                  </SwiperSlide>
                 ))}
-              </div>
+              </Swiper>
             </div>
           )}
         </div>
@@ -164,17 +192,29 @@ const CompanyDetails = () => {
           {accreditationSuggestions.length > 0 && (
             <div className="mt-8">
               <h3 className="text-xl font-bold text-purple-700 mb-4">Suggested Accreditations</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Swiper
+                modules={[Navigation, Autoplay]}
+                navigation
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                spaceBetween={20}
+                slidesPerView={1}
+                breakpoints={{
+                  640: { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+                }}
+              >
                 {accreditationSuggestions.map((acc) => (
-                  <div key={acc.accreditationID} className="bg-gray-50 p-4 rounded-lg shadow-md">
-                    <h3 className="text-xl font-bold text-gray-800">{acc.accreditationName}</h3>
-                    <p className="text-gray-600 text-sm mt-2">{acc.accreditationDescription.slice(0, 100)}...</p>
-                    <button className="mt-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-300">
-                      Learn More
-                    </button>
-                  </div>
+                  <SwiperSlide key={acc.accreditationID}>
+                    <div className="bg-gray-50 p-4 rounded-lg shadow-md">
+                      <h3 className="text-xl font-bold text-gray-800">{acc.accreditationName}</h3>
+                      <p className="text-gray-600 text-sm mt-2">{acc.accreditationDescription.slice(0, 100)}...</p>
+                      <button className="mt-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-300">
+                        Learn More
+                      </button>
+                    </div>
+                  </SwiperSlide>
                 ))}
-              </div>
+              </Swiper>
             </div>
           )}
         </div>
