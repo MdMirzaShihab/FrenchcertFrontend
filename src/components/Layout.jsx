@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer"; // Import the Footer component
+import Footer from "../components/Footer";
 import { Outlet } from "react-router-dom";
+import VerifyCertificate from "../components/VerifyCertificate";
 
 const Layout = () => {
   return (
@@ -15,6 +16,9 @@ const Layout = () => {
 
       {/* Footer at the bottom */}
       <Footer />
+
+      {/* Floating Verify Button and Form */}
+      <VerifyCertificate />
     </>
   );
 };

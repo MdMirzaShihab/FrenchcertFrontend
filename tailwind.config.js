@@ -9,6 +9,9 @@ export default {
           "100%": { transform: "translateY(0)" },
         },
       },
+      fontFamily: {
+        'dancing-script': ['Dancing Script', 'cursive'],
+      },
       animation: {
         upDown: "upDown 5s ease-in-out infinite",
       },

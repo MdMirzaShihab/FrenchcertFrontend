@@ -14,10 +14,12 @@ import Accreditations from "../pages/Accreditations/Accreditations";
 
 
 import ISO9001 from "../pages/Services/ISO9001"
+import VerifyCertificate from "../components/VerifyCertificate";
 
 const routes = [
   { path: "/", element: <HomePage /> },
-  { path: "/validate", element: <ValidateCertificate /> },
+  { path: "/verify", element: <VerifyCertificate /> },
+  { path: "/validate/:certificationID", element: <ValidateCertificate /> },
   { path: "/login", element: <CompanyLogin /> },
   { path: "/company-details/:companyID", element: <CompanyDetails /> }, 
   { path: "/accreditations", element: <Accreditations /> }, 
