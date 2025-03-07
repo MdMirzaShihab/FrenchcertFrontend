@@ -15,7 +15,7 @@ const servicesData = [
     serviceID: 3,
     serviceName: "ISO 27001",
     serviceDescription:
-      "OHSAS 18001:2007 Certification, AB-CAB, AB-CAB Accredited Certification Body, ABCAB, ABCAB Accreditation, ABCAB Accreditation Services, ABCAB Accredited Certificate, become partner for ISO Marketing, How to get brnach of Certificaiton Body, franchisee for ISO Certification Body, TNVUK, TNV-UK, TNV Certification UK Ltd.",
+      "ISO 27001 is an internationally recognized standard for information security management systems (ISMS). It provides a systematic approach to managing sensitive company information, ensuring its confidentiality, integrity, and availability. The certification outlines a framework for identifying, assessing, and managing information security risks, allowing organizations to establish policies, procedures, and controls to protect data from threats. Achieving ISO 27001 certification demonstrates an organization’s commitment to securing its information assets, enhancing its reputation, and meeting legal, regulatory, and contractual security requirements.",
   },
   {
     serviceID: 4,
@@ -253,6 +253,52 @@ const companiesData = [
         FirstSurveillanceDate: "2024-07-24",
         SecondSurveillanceDate: "2025-07-24",
         expiryDate: "2026-08-23",
+        Accreditation:"AB-CAB",
+        status: "Active",
+        validity: 3,
+      },
+    ],
+    trainings: [
+      {
+        trainingID: 1,
+        trainingName: "Quality Management Training",
+        completionDate: "2022-03-10",
+      },
+      {
+        trainingID: 2,
+        trainingName: "Information Security Training",
+        completionDate: "2021-12-05",
+      },
+    ],
+    accreditations: [
+      {
+        accreditationID: 1,
+        accreditationName: "AB-CAB Accredited",
+        issueDate: "2022-05-01",
+        expiryDate: "2025-05-01",
+      },
+    ],
+  },
+  {
+    companyID: 5,
+    companyName: "CORNEA SOFT & IT SOLUTION LTD.",
+    companyOrigin: "Bangladesh",
+    validity: "Valid",
+    companyCategory: "Tech",
+    companyScope: "IT & ITES, Solution Integration, Cyber Security Services, Software Development, Software-Hardware & Networking Products Supply, Installation, Commissioning and Maintenance, Pre-Post Sales, IT Department, Service Provider, IT/ITES Training, BPO, Call Center, ISP, Technology Consultancy, Business Continuity management, PMO, Digital Branding & Promotion, Human Resources, Procurement, Physical Security and Facility Management, On Premises & Cloud Data Center Services & Solutions",
+    companyEmail: "info@techsolutions.com",
+    companyPhone: "+1 (123) 456-7890",
+    companyAddress: "2nd floor, Darogoa Market, Road 7/A, Zigatola, Dhanmondi, Dhaka 1209, Bangladesh",
+    password: "tech123",
+    certifications: [
+      {
+        certificationID: "2404300800501",
+        serviceID: 3,
+        certificationName: "ISO 27001:2022",
+        issueDate: "2025-03-03",
+        FirstSurveillanceDate: "2026-03-30",
+        SecondSurveillanceDate: "2027-03-30",
+        expiryDate: "2028-04-29",
         Accreditation:"AB-CAB",
         status: "Active",
         validity: 3,

@@ -19,7 +19,7 @@ const VerifyCertificate = () => {
       <div className="fixed right-2 top-1/2 transform -translate-y-1/2 z-50 flex flex-col items-end gap-4 sm:top-1/2 sm:right-8 bg-">
         {/* Floating Verify Button */}
         <div className="flex items-center group">
-          <p className="text-blue-600 hidden md:block font-bold text-2xl font-dancing-script opacity-20 transition-opacity duration-700 group-hover:opacity-100">
+          <p className="text-blue-600 hidden md:block font-bold text-2xl font-dancing-script opacity-40 transition-opacity duration-700 group-hover:opacity-100">
             Click to Verify
           </p>
           <button

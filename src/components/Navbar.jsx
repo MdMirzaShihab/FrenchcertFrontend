@@ -35,16 +35,6 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <button
-              onClick={() => {
-                setIsVerifyModalOpen(true); // Open Verify modal
-                setIsOpen(false); // Close mobile menu
-              }}
-              className="hover:text-blue-400 transition">
-              Verify
-            </button>
-          </li>
-          <li>
             <Link
               to="/process"
               className="hover:text-blue-400 transition"
