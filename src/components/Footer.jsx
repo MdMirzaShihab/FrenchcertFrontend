@@ -49,7 +49,6 @@ const Footer = () => {
               <li>Armstrong House, First Avenue, Robin Hood Airport</li>
               <li>Doncaster, South Yorkshire, DN9 3GA, U.K.</li>
               <li>Email: 	info@frenchcert.org</li>
-              <li>Phone: +1 (123) 456-7890</li>
             </ul>
           </div>
 

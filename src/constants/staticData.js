@@ -80,12 +80,6 @@ const accreditationData = [
     accreditationDescription:
       "AB-CAB provide accredaiton for Industry-Specific Accreditation and TNV have plan to apply for accreditation for the following: cGMP/GMP, EPA Energy Star, Hotel Star Rating, Food Test, TNI Environmental, Maturity Level, Green Certification, HALAL",
   },
-  {
-    accreditationID: 5,
-    accreditationName: "ISO 15189 Accreditation",
-    accreditationDescription:
-      "TNV UK is not yet accredited for this but plan to apply accrediaiton to AB-CAB for ISO 15189 Medical Lab Accreditation in year 2017.",
-  },
 ];
 
 const trainingData = [
