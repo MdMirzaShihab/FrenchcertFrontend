@@ -127,7 +127,6 @@ const companiesData = [
         certificationName: "ISO 9001:2015",
         issueDate: "2022-07-15",
         expiryDate: "2025-07-15",
-        status: "Actie",
       },
       {
         certificationID: "CERT-002",
@@ -256,6 +255,7 @@ const companiesData = [
         expiryDate: "2026-08-23",
         Accreditation:"AB-CAB",
         status: "Active",
+        validity: 3,
       },
     ],
     trainings: [
