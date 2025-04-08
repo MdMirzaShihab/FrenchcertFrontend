@@ -1,6 +1,17 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "../components/Layout";
 
+import AdminLayout from "../components/AdminLayout";
+import AdminDashboard from "../pages/Admin/AdminDashboard";
+import CertificationList from "../pages/Admin/Certifications/CertificationList";
+import CertificationForm from "../pages/Admin/Certifications/CertificationForm";
+import TrainingList from "../pages/Admin/Trainings/TrainingList";
+import TrainingForm from "../pages/Admin/Trainings/TrainingForm";
+import CompanyList from "../pages/Admin/Companies/CompanyList";
+import CompanyForm from "../pages/Admin/Companies/CompanyForm";
+import CompanyView from "../pages/Admin/Companies/CompanyView";
+import AddCertificationToCompany from "../pages/Admin/Companies/AddCertificationToCompany";
+import AddTrainingToCompany from "../pages/Admin/Companies/AddTrainingToCompany";
 
 import HomePage from "../pages/HomePage";
 import ValidateCertificate from "../pages/ValidateCertificate";
@@ -14,8 +25,7 @@ import JoinUs from "../pages/JoinUs/JoinUs";
 import Process from "../pages/Processes/Processes";
 import Accreditations from "../pages/Accreditations/Accreditations";
 
-
-import ISO9001 from "../pages/Services/ISO9001"
+import ISO9001 from "../pages/Services/ISO9001";
 import ISO14001 from "../pages/Services/ISO14001";
 import ISO27001 from "../pages/Services/ISO27001";
 import ISO50001 from "../pages/Services/ISO50001";
@@ -25,39 +35,71 @@ import ISO45001 from "../pages/Services/ISO45001";
 import IATF16949 from "../pages/Services/IATF16949";
 import EN9100_EN9120 from "../pages/Services/EN9100_EN9120";
 
-
-const routes = [
-  { path: "/", element: <HomePage /> },
-  { path: "/validate/:certificationID", element: <ValidateCertificate /> },
-  { path: "/login", element: <CompanyLogin /> },
-  { path: "/company-details/:companyID", element: <CompanyDetails /> }, 
-  { path: "/accreditations", element: <Accreditations /> }, 
-  { path: "/career", element: <Career /> },
-  { path: "/services", element: <Services /> },
-  { path: "/about", element: <About /> },
-  { path: "/contact", element: <Contact /> },
-  { path: "/join-us", element: <JoinUs /> },
-  { path: "/process", element: <Process /> },
-
-
-  { path: "/iso9001", element: <ISO9001 /> },
-  { path: "/iso14001", element: <ISO14001 /> },
-  { path: "/iso27001", element: <ISO27001 /> },
-  { path: "/iso50001", element: <ISO50001 /> },
-  { path: "/iso22000", element: <ISO22000 /> },
-  { path: "/fssc22000", element: <FSSC22000 /> },
-  { path: "/iso45001", element: <ISO45001 /> },
-  { path: "/iatf16949", element: <IATF16949 /> },
-  { path: "/en9100-en9120", element: <EN9100_EN9120 /> },  
-];
-
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Public routes with main layout */}
       <Route path="/" element={<Layout />}>
-        {routes.map((route, index) => (
-          <Route key={index} path={route.path} element={route.element} />
-        ))}
+        <Route index element={<HomePage />} />
+        <Route
+          path="validate/:certificationID"
+          element={<ValidateCertificate />}
+        />
+        <Route path="login" element={<CompanyLogin />} />
+        <Route path="company-details/:companyID" element={<CompanyDetails />} />
+        <Route path="accreditations" element={<Accreditations />} />
+        <Route path="career" element={<Career />} />
+        <Route path="services" element={<Services />} />
+        <Route path="about" element={<About />} />
+        <Route path="contact" element={<Contact />} />
+        <Route path="join-us" element={<JoinUs />} />
+        <Route path="process" element={<Process />} />
+
+        {/* Service pages */}
+        <Route path="iso9001" element={<ISO9001 />} />
+        <Route path="iso14001" element={<ISO14001 />} />
+        <Route path="iso27001" element={<ISO27001 />} />
+        <Route path="iso50001" element={<ISO50001 />} />
+        <Route path="iso22000" element={<ISO22000 />} />
+        <Route path="fssc22000" element={<FSSC22000 />} />
+        <Route path="iso45001" element={<ISO45001 />} />
+        <Route path="iatf16949" element={<IATF16949 />} />
+        <Route path="en9100-en9120" element={<EN9100_EN9120 />} />
+      </Route>
+
+      {/* Admin routes with admin layout */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+
+        {/* Certifications routes */}
+        <Route path="certifications">
+          <Route index element={<CertificationList />} />
+          <Route path="add" element={<CertificationForm />} />
+          <Route path="edit/:id" element={<CertificationForm isEdit />} />
+        </Route>
+
+        {/* Trainings routes */}
+        <Route path="trainings">
+          <Route index element={<TrainingList />} />
+          <Route path="add" element={<TrainingForm />} />
+          <Route path="edit/:id" element={<TrainingForm isEdit />} />
+        </Route>
+
+        {/* Companies routes */}
+        <Route path="companies">
+          <Route index element={<CompanyList />} />
+          <Route path="add" element={<CompanyForm />} />
+          <Route path="edit/:id" element={<CompanyForm isEdit />} />
+          <Route path="view/:id" element={<CompanyView />} />
+          <Route
+            path=":companyId/add-certification"
+            element={<AddCertificationToCompany />}
+          />
+          <Route
+            path=":companyId/add-training"
+            element={<AddTrainingToCompany />}
+          />
+        </Route>
       </Route>
     </Routes>
   );
