@@ -1,5 +1,5 @@
 import { Outlet, Link } from "react-router-dom";
-import { FaHome, FaBuilding, FaCertificate, FaChalkboardTeacher, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaBuilding, FaCertificate, FaChalkboardTeacher, FaSignOutAlt, FaClipboardList } from "react-icons/fa";
 
 const AdminLayout = () => {
   return (
@@ -27,6 +27,11 @@ const AdminLayout = () => {
             <li>
               <Link to="/admin/trainings" className="flex items-center p-2 rounded hover:bg-blue-700">
                 <FaChalkboardTeacher className="mr-2" /> Trainings
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin/fields" className="flex items-center p-2 rounded hover:bg-blue-700">
+                <FaClipboardList className="mr-2" /> Fields
               </Link>
             </li>
             <li className="absolute bottom-4">

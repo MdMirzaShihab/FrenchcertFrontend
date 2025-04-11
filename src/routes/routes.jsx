@@ -12,6 +12,8 @@ import CompanyForm from "../pages/Admin/Companies/CompanyForm";
 import CompanyView from "../pages/Admin/Companies/CompanyView";
 import AddCertificationToCompany from "../pages/Admin/Companies/AddCertificationToCompany";
 import AddTrainingToCompany from "../pages/Admin/Companies/AddTrainingToCompany";
+import FieldForm from "../pages/Admin/Fields/FieldForm";
+import FieldList from "../pages/Admin/Fields/FieldList";
 
 import HomePage from "../pages/HomePage";
 import ValidateCertificate from "../pages/ValidateCertificate";
@@ -100,6 +102,14 @@ const AppRoutes = () => {
             element={<AddTrainingToCompany />}
           />
         </Route>
+
+        {/* Fields routes */}
+        <Route path="fields">
+          <Route index element={<FieldList />} />
+          <Route path="add" element={<FieldForm />} />
+          <Route path="edit/:id" element={<FieldForm isEdit />} />
+        </Route>
+        
       </Route>
     </Routes>
   );
