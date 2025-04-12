@@ -9,14 +9,13 @@ const TrainingForm = ({ isEdit = false }) => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [availableTypes, setAvailableTypes] = useState([]);
   const [availableMethods, setAvailableMethods] = useState([]);
   const [availableFields, setAvailableFields] = useState([]);
   
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    trainingType: "",
+    trainingType: "", // Changed to free-form input
     trainingMethod: [],
     fields: [],
     durationInHours: 8
@@ -27,13 +26,12 @@ const TrainingForm = ({ isEdit = false }) => {
       try {
         setLoading(true);
         
-        const [typesRes, methodsRes, fieldsRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/trainings/types/list`),
+        // Removed the types API call since we're not using dropdown anymore
+        const [methodsRes, fieldsRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/trainings/methods/list`),
           axios.get(`${BASE_URL}/api/fields`)
         ]);
         
-        if (typesRes.data.success) setAvailableTypes(typesRes.data.data);
         if (methodsRes.data.success) setAvailableMethods(methodsRes.data.data);
         if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data);
         
@@ -163,23 +161,20 @@ const TrainingForm = ({ isEdit = false }) => {
             />
           </div>
 
-          <div>
+          <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">
               Training Type <span className="text-red-500">*</span>
             </label>
-            <select
+            <input
+              type="text"
               name="trainingType"
               value={formData.trainingType}
               onChange={handleChange}
               className="w-full p-2 border rounded"
               required
               disabled={loading}
-            >
-              <option value="">Select Type</option>
-              {availableTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
+              placeholder="e.g., Safety Training, Technical Skills, etc."
+            />
           </div>
 
           <div>

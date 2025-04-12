@@ -10,7 +10,7 @@ import TrainingForm from "../pages/Admin/Trainings/TrainingForm";
 import CompanyList from "../pages/Admin/Companies/CompanyList";
 import CompanyForm from "../pages/Admin/Companies/CompanyForm";
 import CompanyView from "../pages/Admin/Companies/CompanyView";
-import AddCertificationToCompany from "../pages/Admin/Companies/AddCertificationToCompany";
+import AddCertificationToCompany from "../pages/Admin/Companies/CertificationToCompanyForm";
 import AddTrainingToCompany from "../pages/Admin/Companies/AddTrainingToCompany";
 import FieldForm from "../pages/Admin/Fields/FieldForm";
 import FieldList from "../pages/Admin/Fields/FieldList";
@@ -109,7 +109,7 @@ const AppRoutes = () => {
           <Route path="add" element={<FieldForm />} />
           <Route path="edit/:id" element={<FieldForm isEdit />} />
         </Route>
-        
+
       </Route>
     </Routes>
   );

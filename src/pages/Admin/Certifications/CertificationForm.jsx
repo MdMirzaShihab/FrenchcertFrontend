@@ -9,40 +9,36 @@ const CertificationForm = ({ isEdit = false }) => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [availableTypes, setAvailableTypes] = useState([]);
   const [availableFields, setAvailableFields] = useState([]);
-  
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     certificationType: "",
     fields: [],
-    durationInMonths: 12
+    durationInMonths: 12,
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        const [typesRes, fieldsRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/certifications/types/list`),
-          axios.get(`${BASE_URL}/api/fields`)
-        ]);
-        
-        if (typesRes.data.success) setAvailableTypes(typesRes.data.data);
+
+        const fieldsRes = await axios.get(`${BASE_URL}/api/fields`);
         if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data);
-        
+
         if (isEdit) {
-          const certRes = await axios.get(`${BASE_URL}/api/certifications/${id}`);
+          const certRes = await axios.get(
+            `${BASE_URL}/api/certifications/${id}`
+          );
           if (certRes.data.success) {
             const cert = certRes.data.data;
             setFormData({
               name: cert.name,
               description: cert.description,
               certificationType: cert.certificationType,
-              fields: cert.fields.map(f => f._id),
-              durationInMonths: cert.durationInMonths || 12
+              fields: cert.fields.map((f) => f._id),
+              durationInMonths: cert.durationInMonths || 12,
             });
           }
         }
@@ -53,21 +49,21 @@ const CertificationForm = ({ isEdit = false }) => {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, [isEdit, id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFieldToggle = (fieldId) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       fields: prev.fields.includes(fieldId)
-        ? prev.fields.filter(id => id !== fieldId)
-        : [...prev.fields, fieldId]
+        ? prev.fields.filter((id) => id !== fieldId)
+        : [...prev.fields, fieldId],
     }));
   };
 
@@ -77,8 +73,8 @@ const CertificationForm = ({ isEdit = false }) => {
     setError(null);
 
     try {
-      const url = isEdit 
-        ? `${BASE_URL}/api/certifications/${id}` 
+      const url = isEdit
+        ? `${BASE_URL}/api/certifications/${id}`
         : `${BASE_URL}/api/certifications`;
       const method = isEdit ? "put" : "post";
 
@@ -86,8 +82,8 @@ const CertificationForm = ({ isEdit = false }) => {
 
       if (response.data.success) {
         toast.success(
-          isEdit 
-            ? "Certification updated successfully" 
+          isEdit
+            ? "Certification updated successfully"
             : "Certification created successfully"
         );
         navigate("/admin/certifications");
@@ -112,9 +108,7 @@ const CertificationForm = ({ isEdit = false }) => {
       </h1>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-          {error}
-        </div>
+        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">{error}</div>
       )}
 
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow">
@@ -149,23 +143,20 @@ const CertificationForm = ({ isEdit = false }) => {
             />
           </div>
 
-          <div>
+          <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">
               Certification Type <span className="text-red-500">*</span>
             </label>
-            <select
+            <input
+              type="text"
               name="certificationType"
               value={formData.certificationType}
               onChange={handleChange}
               className="w-full p-2 border rounded"
               required
               disabled={loading}
-            >
-              <option value="">Select Type</option>
-              {availableTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
+              placeholder="e.g., ISO 9001, Cybersecurity, etc."
+            />
           </div>
 
           <div>
@@ -187,7 +178,7 @@ const CertificationForm = ({ isEdit = false }) => {
           <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">Fields</label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {availableFields.map(field => (
+              {availableFields.map((field) => (
                 <label key={field._id} className="flex items-center">
                   <input
                     type="checkbox"
@@ -208,22 +199,18 @@ const CertificationForm = ({ isEdit = false }) => {
             type="button"
             onClick={() => navigate("/admin/certifications")}
             className="px-4 py-2 border rounded text-gray-700"
-            disabled={loading}
-          >
+            disabled={loading}>
             Cancel
           </button>
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-blue-400"
-            disabled={loading}
-          >
-            {loading ? (
-              "Processing..."
-            ) : isEdit ? (
-              "Update Certification"
-            ) : (
-              "Save Certification"
-            )}
+            disabled={loading}>
+            {loading
+              ? "Processing..."
+              : isEdit
+              ? "Update Certification"
+              : "Save Certification"}
           </button>
         </div>
       </form>

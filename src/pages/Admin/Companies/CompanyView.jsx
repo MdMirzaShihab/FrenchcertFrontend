@@ -9,63 +9,44 @@ import {
   FaSpinner, FaExclamationTriangle
 } from 'react-icons/fa';
 import { BASE_URL } from "../../../secrets";
+import CompanyCertifications from './CompanyCertifications';
+import CompanyTrainings from './CompanyTrainings';
 
 const CompanyView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [company, setCompany] = useState(null);
-  const [certifications, setCertifications] = useState([]);
-  const [trainings, setTrainings] = useState([]);
   const [activeTab, setActiveTab] = useState('details');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-        try {
-          setLoading(true);
-          setError(null);
-          
-          // Always fetch company data first
-          const companyRes = await axios.get(`${BASE_URL}/api/companies/${id}`);
-          
-          if (!companyRes.data.success) {
-            throw new Error('Company not found');
-          }
-      
-          setCompany(companyRes.data.data);
-      
-          // Now try to fetch certifications and trainings, but don't fail if they error
-          try {
-            const certificationsRes = await axios.get(`${BASE_URL}/api/company-certifications/company/${id}`);
-            setCertifications(certificationsRes.data.success ? certificationsRes.data.data : []);
-          } catch (certError) {
-            console.error('Error fetching certifications:', certError);
-            setCertifications([]);
-          }
-      
-          try {
-            const trainingsRes = await axios.get(`${BASE_URL}/api/company-trainings/company/${id}`);
-            setTrainings(trainingsRes.data.success ? trainingsRes.data.data : []);
-          } catch (trainingError) {
-            console.error('Error fetching trainings:', trainingError);
-            setTrainings([]);
-          }
-      
-        } catch (error) {
-          console.error('Error fetching company data:', error);
-          setError(error.response?.data?.message || error.message || 'Failed to load company data');
-          toast.error(error.response?.data?.message || 'Failed to load company data');
-          
-          if (error.response?.status === 404) {
-            navigate('/admin/companies', { replace: true });
-          }
-        } finally {
-          setLoading(false);
+    const fetchCompanyData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const companyRes = await axios.get(`${BASE_URL}/api/companies/${id}`);
+        
+        if (!companyRes.data.success) {
+          throw new Error('Company not found');
         }
-      };
 
-    fetchData();
+        setCompany(companyRes.data.data);
+      } catch (error) {
+        console.error('Error fetching company data:', error);
+        setError(error.response?.data?.message || error.message || 'Failed to load company data');
+        toast.error(error.response?.data?.message || 'Failed to load company data');
+        
+        if (error.response?.status === 404) {
+          navigate('/admin/companies', { replace: true });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompanyData();
   }, [id, navigate]);
 
   const handleDeleteCompany = async () => {
@@ -207,11 +188,6 @@ const CompanyView = () => {
           >
             <FaCertificate className="mr-1" />
             Certifications
-            {certifications.length > 0 && (
-              <span className="ml-2 bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-xs">
-                {certifications.length}
-              </span>
-            )}
           </button>
           
           <button
@@ -224,11 +200,6 @@ const CompanyView = () => {
           >
             <FaGraduationCap className="mr-1" />
             Trainings
-            {trainings.length > 0 && (
-              <span className="ml-2 bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-xs">
-                {trainings.length}
-              </span>
-            )}
           </button>
         </nav>
       </div>
@@ -345,199 +316,11 @@ const CompanyView = () => {
       )}
       
       {activeTab === 'certifications' && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-800 flex items-center">
-              <FaCertificate className="mr-2 text-blue-600" />
-              Certifications
-            </h2>
-            
-            <Link
-              to={`/admin/companies/${company._id}/add-certification`}
-              className="px-3 py-2 bg-green-600 text-white text-sm rounded-md flex items-center hover:bg-green-700 transition-colors"
-            >
-              <FaCertificate className="mr-1" />
-              Add Certification
-            </Link>
-          </div>
-          
-          {certifications.length === 0 ? (
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-md p-8 text-center">
-              <FaCertificate className="mx-auto text-gray-400 text-4xl mb-4" />
-              <h3 className="text-lg font-medium text-gray-700 mb-2">No Certifications</h3>
-              <p className="text-gray-500 mb-4">
-                This company does not have any certifications recorded yet.
-              </p>
-              <Link
-                to={`/admin/companies/${company._id}/add-certification`}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Add First Certification
-              </Link>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Certificate Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Issued By
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Issue Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Expiry Date
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {certifications.map(cert => (
-                    <tr key={cert._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <FaCertificate className="text-blue-600 mr-2" />
-                          <span className="text-sm font-medium text-gray-900">{cert.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {cert.issuedBy}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(cert.issueDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {cert.expiryDate ? new Date(cert.expiryDate).toLocaleDateString() : 'No Expiry'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
-                          <Link 
-                            to={`/certifications/${cert._id}`}
-                            className="text-blue-600 hover:text-blue-900"
-                            title="View Details"
-                          >
-                            <FaEye />
-                          </Link>
-                          <Link 
-                            to={`/admin/certifications/edit/${cert._id}`}
-                            className="text-green-600 hover:text-green-900"
-                            title="Edit Certification"
-                          >
-                            <FaEdit />
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <CompanyCertifications companyId={company._id} />
       )}
       
       {activeTab === 'trainings' && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-800 flex items-center">
-              <FaGraduationCap className="mr-2 text-blue-600" />
-              Trainings
-            </h2>
-            
-            <Link
-              to={`/admin/companies/${company._id}/add-training`}
-              className="px-3 py-2 bg-green-600 text-white text-sm rounded-md flex items-center hover:bg-green-700 transition-colors"
-            >
-              <FaGraduationCap className="mr-1" />
-              Add Training
-            </Link>
-          </div>
-          
-          {trainings.length === 0 ? (
-            <div className="bg-gray-50 border border-dashed border-gray-300 rounded-md p-8 text-center">
-              <FaGraduationCap className="mx-auto text-gray-400 text-4xl mb-4" />
-              <h3 className="text-lg font-medium text-gray-700 mb-2">No Trainings</h3>
-              <p className="text-gray-500 mb-4">
-                This company does not have any trainings recorded yet.
-              </p>
-              <Link
-                to={`/admin/companies/${company._id}/add-training`}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Add First Training
-              </Link>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Training Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Provider
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Start Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      End Date
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {trainings.map(training => (
-                    <tr key={training._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <FaGraduationCap className="text-blue-600 mr-2" />
-                          <span className="text-sm font-medium text-gray-900">{training.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {training.provider}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(training.startDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(training.endDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
-                          <Link 
-                            to={`/trainings/${training._id}`}
-                            className="text-blue-600 hover:text-blue-900"
-                            title="View Details"
-                          >
-                            <FaEye />
-                          </Link>
-                          <Link 
-                            to={`/trainings/edit/${training._id}`}
-                            className="text-green-600 hover:text-green-900"
-                            title="Edit Training"
-                          >
-                            <FaEdit />
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <CompanyTrainings companyId={company._id} />
       )}
     </div>
   );

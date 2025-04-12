@@ -19,45 +19,80 @@ const CertificationList = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch certifications with filters
         const params = new URLSearchParams();
-        if (searchTerm) params.append('search', searchTerm);
-        if (typeFilter) params.append('type', typeFilter);
-        if (fieldFilter) params.append('field', fieldFilter);
-        
+        if (searchTerm) params.append("search", searchTerm);
+        if (typeFilter) params.append("type", typeFilter);
+        if (fieldFilter) params.append("field", fieldFilter);
+
         const [certsRes, typesRes, fieldsRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/certifications?${params}`),
           axios.get(`${BASE_URL}/api/certifications/types/list`),
-          axios.get(`${BASE_URL}/api/fields`)
+          axios.get(`${BASE_URL}/api/fields`),
         ]);
-        
+
         if (certsRes.data.success) setCertifications(certsRes.data.data);
         if (typesRes.data.success) setAvailableTypes(typesRes.data.data);
         if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data);
-        
       } catch (error) {
-        toast.error("Failed to fetch data: " + (error.response?.data?.message || error.message));
+        toast.error(
+          "Failed to fetch data: " +
+            (error.response?.data?.message || error.message)
+        );
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, [searchTerm, typeFilter, fieldFilter]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this certification?")) return;
-    
+    if (!window.confirm("Are you sure you want to delete this certification?"))
+      return;
+
     setDeletingId(id);
     try {
-      const response = await axios.delete(`${BASE_URL}/api/certifications/${id}`);
+      const response = await axios.delete(
+        `${BASE_URL}/api/certifications/${id}`
+      );
+
       if (response.data.success) {
-        setCertifications(certifications.filter(c => c._id !== id));
         toast.success("Certification deleted successfully");
+        setCertifications((prev) => prev.filter((c) => c._id !== id));
+      } else {
+        // Handle cases where the backend returns success: false
+        throw new Error(response.data.message || "Delete operation failed");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete certification");
+      console.error("Detailed delete error:", {
+        message: error.message,
+        response: error.response,
+        stack: error.stack,
+      });
+
+      // Enhanced error message handling
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to delete certification";
+
+      toast.error(errorMessage);
+
+      // Specific handling for reference errors
+      if (
+        errorMessage.toLowerCase().includes("assigned") ||
+        errorMessage.toLowerCase().includes("reference")
+      ) {
+        toast.warning(
+          "This certification cannot be deleted as it's currently assigned to companies",
+          {
+            autoClose: 7000,
+          }
+        );
+      }
     } finally {
       setDeletingId(null);
     }
@@ -77,8 +112,7 @@ const CertificationList = () => {
         <h1 className="text-2xl font-bold">Certification Management</h1>
         <Link
           to="/admin/certifications/add"
-          className="bg-blue-600 text-white px-4 py-2 rounded flex items-center hover:bg-blue-700"
-        >
+          className="bg-blue-600 text-white px-4 py-2 rounded flex items-center hover:bg-blue-700">
           <FaPlus className="mr-2" /> Add Certification
         </Link>
       </div>
@@ -94,33 +128,36 @@ const CertificationList = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <select
           className="p-2 border rounded"
           value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-        >
+          onChange={(e) => setTypeFilter(e.target.value)}>
           <option value="">All Types</option>
-          {availableTypes.map(type => (
-            <option key={type} value={type}>{type}</option>
+          {availableTypes.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
           ))}
         </select>
-        
+
         <select
           className="p-2 border rounded"
           value={fieldFilter}
-          onChange={(e) => setFieldFilter(e.target.value)}
-        >
+          onChange={(e) => setFieldFilter(e.target.value)}>
           <option value="">All Fields</option>
-          {availableFields.map(field => (
-            <option key={field._id} value={field._id}>{field.name}</option>
+          {availableFields.map((field) => (
+            <option key={field._id} value={field._id}>
+              {field.name}
+            </option>
           ))}
         </select>
       </div>
 
       {certifications.length === 0 ? (
         <div className="bg-white p-6 rounded-lg shadow text-center">
-          No certifications found. Try adjusting your filters or add a new certification.
+          No certifications found. Try adjusting your filters or add a new
+          certification.
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -149,7 +186,9 @@ const CertificationList = () => {
                 {certifications.map((cert) => (
                   <tr key={cert._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{cert.name}</div>
+                      <div className="font-medium text-gray-900">
+                        {cert.name}
+                      </div>
                       <div className="text-gray-500 text-sm mt-1 line-clamp-2">
                         {cert.description}
                       </div>
@@ -161,8 +200,10 @@ const CertificationList = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
-                        {cert.fields?.map(field => (
-                          <span key={field._id} className="px-2 py-1 text-xs rounded-full bg-gray-100">
+                        {cert.fields?.map((field) => (
+                          <span
+                            key={field._id}
+                            className="px-2 py-1 text-xs rounded-full bg-gray-100">
                             {field.name}
                           </span>
                         ))}
@@ -174,17 +215,18 @@ const CertificationList = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link
                         to={`/admin/certifications/edit/${cert._id}`}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
-                      >
+                        className="text-blue-600 hover:text-blue-900 mr-4">
                         <FaEdit />
                       </Link>
                       <button
                         onClick={() => handleDelete(cert._id)}
                         className="text-red-600 hover:text-red-900"
                         disabled={deletingId === cert._id}
-                      >
+                        title={
+                          deletingId === cert._id ? "Deleting..." : "Delete"
+                        }>
                         {deletingId === cert._id ? (
-                          <FaSpinner className="animate-spin" />
+                          <FaSpinner className="animate-spin inline-block" />
                         ) : (
                           <FaTrash />
                         )}
