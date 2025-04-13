@@ -87,7 +87,7 @@ const CompanyForm = () => {
           setFields(response.data.data);
         }
       } catch (error) {
-        toast.error("Failed to load fields");
+        toast.error(`Failed to load fields ${error.message}`);
       }
     };
     fetchFields();
@@ -142,20 +142,6 @@ const CompanyForm = () => {
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleFieldsChange = (e) => {
-    const options = e.target.options;
-    const selected = [];
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        selected.push(options[i].value);
-      }
-    }
-    setSelectedFields(selected);
-    if (errors.fields) {
-      setErrors((prev) => ({ ...prev, fields: undefined }));
     }
   };
 

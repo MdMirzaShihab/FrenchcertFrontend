@@ -10,6 +10,7 @@ import {
   FaSpinner,
   FaSave,
   FaArrowLeft,
+  FaIdCard,
 } from "react-icons/fa";
 import { BASE_URL } from "../../../../secrets";
 
@@ -20,6 +21,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
   const [formData, setFormData] = useState({
     company: companyId,
     certification: "",
+    certificationId: "", // Add certificationId to form state
     issueDate: "",
     expiryDate: "",
     firstSurveillanceDate: "",
@@ -76,6 +78,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             setFormData({
               company: certData.company._id,
               certification: certData.certification._id,
+              certificationId: certData.certificationId, // Include certificationId in form data
               issueDate: formatDateForInput(certData.issueDate),
               expiryDate: formatDateForInput(certData.expiryDate),
               firstSurveillanceDate: formatDateForInput(
@@ -137,7 +140,15 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
 
       const method = isEdit ? "put" : "post";
 
-      const response = await axios[method](endpoint, formData);
+      // For new certifications, if certificationId is empty, let the backend generate it
+      const payload = isEdit 
+        ? formData 
+        : {
+            ...formData,
+            certificationId: formData.certificationId || undefined
+          };
+
+      const response = await axios[method](endpoint, payload);
 
       if (response.data.success) {
         toast.success(
@@ -215,6 +226,29 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Certification ID */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            <FaIdCard className="inline mr-1" />
+            Certification ID
+            {isEdit && <span className="text-red-500">*</span>}
+          </label>
+          <input
+            type="text"
+            name="certificationId"
+            value={formData.certificationId}
+            onChange={handleChange}
+            required={isEdit} // Required only in edit mode
+            placeholder={isEdit ? "" : "Leave blank to auto-generate"}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
+          {!isEdit && (
+            <p className="text-xs text-gray-500 mt-1">
+              If left blank, a unique ID will be automatically generated
+            </p>
+          )}
+        </div>
+
         {/* Certification Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

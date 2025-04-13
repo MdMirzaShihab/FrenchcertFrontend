@@ -37,6 +37,8 @@ import FSSC22000 from "../pages/Services/FSSC22000";
 import ISO45001 from "../pages/Services/ISO45001";
 import IATF16949 from "../pages/Services/IATF16949";
 import EN9100_EN9120 from "../pages/Services/EN9100_EN9120";
+import CertificationCardList from "../pages/Services/CertificationCardList";
+import CertificationDetail from "../pages/Services/CertificationDetail";
 
 const AppRoutes = () => {
   return (
@@ -68,6 +70,8 @@ const AppRoutes = () => {
         <Route path="iso45001" element={<ISO45001 />} />
         <Route path="iatf16949" element={<IATF16949 />} />
         <Route path="en9100-en9120" element={<EN9100_EN9120 />} />
+        <Route path="certification-cards" element={<CertificationCardList />} />
+        <Route path="certification-cards/:id" element={<CertificationDetail />} />
       </Route>
 
       {/* Admin routes with admin layout */}
