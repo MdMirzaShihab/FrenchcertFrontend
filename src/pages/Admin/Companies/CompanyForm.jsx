@@ -283,7 +283,7 @@ const CompanyForm = () => {
           {/* Employee Count */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Employee Count *
+              Employee Count <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -302,16 +302,16 @@ const CompanyForm = () => {
             )}
           </div>
 
-          {/* Scope */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Scope
+              Scope<span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="scope"
               value={formData.scope}
               onChange={handleChange}
+              required
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
@@ -319,7 +319,7 @@ const CompanyForm = () => {
           {/* Fields */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Fields *
+              Fields <span className="text-red-500">*</span>
             </label>
             {errors.fields && (
               <p className="mt-1 text-sm text-red-600">{errors.fields}</p>
@@ -401,7 +401,7 @@ const CompanyForm = () => {
                 Phone *
               </label>
               <PhoneInput
-                country={"us"} // or default to user’s region
+                country={"bd"}
                 value={formData.phone}
                 onChange={(phone) =>
                   setFormData((prevData) => ({ ...prevData, phone }))
@@ -496,7 +496,7 @@ const CompanyForm = () => {
             {/* Country */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Country *
+                Country <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"

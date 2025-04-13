@@ -10,7 +10,8 @@ import TrainingForm from "../pages/Admin/Trainings/TrainingForm";
 import CompanyList from "../pages/Admin/Companies/CompanyList";
 import CompanyForm from "../pages/Admin/Companies/CompanyForm";
 import CompanyView from "../pages/Admin/Companies/CompanyView";
-import AddCertificationToCompany from "../pages/Admin/Companies/CertificationToCompanyForm";
+import CertificationToCompanyForm from "../pages/Admin/Companies/CompanyCertification/CertificationToCompanyForm";
+import CompanyCertificateView from "../pages/Admin/Companies/CompanyCertification/CompanyCertificateView";
 import AddTrainingToCompany from "../pages/Admin/Companies/AddTrainingToCompany";
 import FieldForm from "../pages/Admin/Fields/FieldForm";
 import FieldList from "../pages/Admin/Fields/FieldList";
@@ -95,11 +96,16 @@ const AppRoutes = () => {
           <Route path="view/:id" element={<CompanyView />} />
           <Route
             path=":companyId/add-certification"
-            element={<AddCertificationToCompany />}
+            element={<CertificationToCompanyForm />}
           />
           <Route
+            path=":companyId/edit-certification/:certificationId"
+            element={<CertificationToCompanyForm isEdit />}
+          />
+          <Route path="certificate/:id" element={<CompanyCertificateView />} />
+          <Route
             path=":companyId/add-training"
-            element={<AddTrainingToCompany />}
+            element={<AddTrainingToCompany/>}
           />
         </Route>
 
@@ -109,7 +115,6 @@ const AppRoutes = () => {
           <Route path="add" element={<FieldForm />} />
           <Route path="edit/:id" element={<FieldForm isEdit />} />
         </Route>
-
       </Route>
     </Routes>
   );

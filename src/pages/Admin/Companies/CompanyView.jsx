@@ -9,7 +9,7 @@ import {
   FaSpinner, FaExclamationTriangle
 } from 'react-icons/fa';
 import { BASE_URL } from "../../../secrets";
-import CompanyCertifications from './CompanyCertifications';
+import CompanyCertifications from './CompanyCertification/CompanyCertifications';
 import CompanyTrainings from './CompanyTrainings';
 
 const CompanyView = () => {
