@@ -3,13 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../../../secrets";
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import TextStyle from '@tiptap/extension-text-style';
-import Color from '@tiptap/extension-color';
-import Link from '@tiptap/extension-link';
-import TextAlign from '@tiptap/extension-text-align';
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import TextStyle from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+import Link from "@tiptap/extension-link";
+import TextAlign from "@tiptap/extension-text-align";
 import {
   FaBold,
   FaItalic,
@@ -24,23 +24,23 @@ import {
   FaAlignLeft,
   FaAlignCenter,
   FaAlignRight,
-  FaAlignJustify
-} from 'react-icons/fa';
+  FaAlignJustify,
+} from "react-icons/fa";
 
 const MenuBar = ({ editor }) => {
   if (!editor) return null;
 
   const addLink = () => {
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('Enter URL', previousUrl || 'https://');
+    const previousUrl = editor.getAttributes("link").href;
+    const url = window.prompt("Enter URL", previousUrl || "https://");
 
     if (url === null) return;
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
       return;
     }
 
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
   return (
@@ -49,93 +49,109 @@ const MenuBar = ({ editor }) => {
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('bold') ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Bold"
-      >
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("bold")
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Bold">
         <FaBold />
       </button>
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('italic') ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Italic"
-      >
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("italic")
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Italic">
         <FaItalic />
       </button>
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleUnderline().run()}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('underline') ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Underline"
-      >
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("underline")
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Underline">
         <FaUnderline />
       </button>
 
       {/* Headings */}
       <div className="h-6 w-px bg-gray-300 mx-1"></div>
-      <div className="relative group">
+      {[1, 2, 3].map((level) => (
         <button
+          key={level}
           type="button"
-          className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('heading') ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-          title="Headings"
-        >
-          <FaHeading />
+          onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
+          className={`p-2 rounded hover:bg-gray-200 ${
+            editor.isActive("heading", { level })
+              ? "bg-gray-200 text-blue-600"
+              : "text-gray-700"
+          }`}
+          title={`Heading ${level}`}>
+          H{level}
         </button>
-        <div className="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg z-10 hidden group-hover:block">
-          <div className="py-1">
-            {[1, 2, 3, 4, 5, 6].map((level) => (
-              <button
-                key={level}
-                type="button"
-                onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
-                className={`block w-full text-left px-4 py-2 text-sm ${editor.isActive('heading', { level }) ? 'bg-blue-100 text-blue-800' : 'text-gray-700 hover:bg-gray-100'}`}
-              >
-                Heading {level}
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => editor.chain().focus().setParagraph().run()}
-              className={`block w-full text-left px-4 py-2 text-sm ${editor.isActive('paragraph') ? 'bg-blue-100 text-blue-800' : 'text-gray-700 hover:bg-gray-100'}`}
-            >
-              Paragraph
-            </button>
-          </div>
-        </div>
-      </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().setParagraph().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("paragraph")
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Paragraph">
+        ¶
+      </button>
 
       {/* Text Alignment */}
       <div className="h-6 w-px bg-gray-300 mx-1"></div>
       <button
         type="button"
-        onClick={() => editor.chain().focus().setTextAlign('left').run()}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive({ textAlign: 'left' }) ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Align Left"
-      >
+        onClick={() => editor.chain().focus().setTextAlign("left").run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive({ textAlign: "left" })
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Align Left">
         <FaAlignLeft />
       </button>
       <button
         type="button"
-        onClick={() => editor.chain().focus().setTextAlign('center').run()}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive({ textAlign: 'center' }) ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Align Center"
-      >
+        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive({ textAlign: "center" })
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Align Center">
         <FaAlignCenter />
       </button>
       <button
         type="button"
-        onClick={() => editor.chain().focus().setTextAlign('right').run()}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive({ textAlign: 'right' }) ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Align Right"
-      >
+        onClick={() => editor.chain().focus().setTextAlign("right").run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive({ textAlign: "right" })
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Align Right">
         <FaAlignRight />
       </button>
       <button
         type="button"
-        onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive({ textAlign: 'justify' }) ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Justify"
-      >
+        onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive({ textAlign: "justify" })
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Justify">
         <FaAlignJustify />
       </button>
 
@@ -144,17 +160,23 @@ const MenuBar = ({ editor }) => {
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('bulletList') ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Bullet List"
-      >
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("bulletList")
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Bullet List">
         <FaListUl />
       </button>
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('orderedList') ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Numbered List"
-      >
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("orderedList")
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Numbered List">
         <FaListOl />
       </button>
 
@@ -163,9 +185,12 @@ const MenuBar = ({ editor }) => {
       <button
         type="button"
         onClick={addLink}
-        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('link') ? 'bg-gray-200 text-blue-600' : 'text-gray-700'}`}
-        title="Link"
-      >
+        className={`p-2 rounded hover:bg-gray-200 ${
+          editor.isActive("link")
+            ? "bg-gray-200 text-blue-600"
+            : "text-gray-700"
+        }`}
+        title="Link">
         <FaLink />
       </button>
 
@@ -179,7 +204,7 @@ const MenuBar = ({ editor }) => {
           id="text-color"
           type="color"
           onInput={(e) => editor.chain().focus().setColor(e.target.value).run()}
-          value={editor.getAttributes('textStyle').color || '#000000'}
+          value={editor.getAttributes("textStyle").color || "#000000"}
           className="h-8 w-8 cursor-pointer border rounded"
           title="Text Color"
         />
@@ -192,8 +217,7 @@ const MenuBar = ({ editor }) => {
         onClick={() => editor.chain().focus().undo().run()}
         disabled={!editor.can().undo()}
         className="p-2 rounded text-gray-700 hover:bg-gray-200 disabled:opacity-50"
-        title="Undo"
-      >
+        title="Undo">
         <FaUndo />
       </button>
       <button
@@ -201,32 +225,32 @@ const MenuBar = ({ editor }) => {
         onClick={() => editor.chain().focus().redo().run()}
         disabled={!editor.can().redo()}
         className="p-2 rounded text-gray-700 hover:bg-gray-200 disabled:opacity-50"
-        title="Redo"
-      >
+        title="Redo">
         <FaRedo />
       </button>
     </div>
   );
 };
 
-
 const CertificationForm = ({ isEdit = false }) => {
-    const navigate = useNavigate();
-    const { id } = useParams();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [availableFields, setAvailableFields] = useState([]);
-  
-    const [formData, setFormData] = useState({
-      name: "",
-      description: "",
-      certificationType: "",
-      fields: [],
-      durationInMonths: 12,
-    });
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [availableFields, setAvailableFields] = useState([]);
 
- // Initialize Tiptap editor with all extensions
- const editor = useEditor({
+  const [formData, setFormData] = useState({
+    name: "",
+    shortDescription: "",
+    description: "",
+    certificationType: "",
+    callToAction: "",
+    fields: [],
+    durationInMonths: 12,
+  });
+
+  // Initialize Tiptap editor with all extensions
+  const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
@@ -239,21 +263,21 @@ const CertificationForm = ({ isEdit = false }) => {
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-500 hover:underline',
+          class: "text-blue-500 hover:underline",
         },
       }),
       TextAlign.configure({
-        types: ['heading', 'paragraph'],
-        alignments: ['left', 'center', 'right', 'justify'],
+        types: ["heading", "paragraph"],
+        alignments: ["left", "center", "right", "justify"],
       }),
     ],
     content: formData.description,
     onUpdate: ({ editor }) => {
-      setFormData(prev => ({ ...prev, description: editor.getHTML() }));
+      setFormData((prev) => ({ ...prev, description: editor.getHTML() }));
     },
     editorProps: {
       attributes: {
-        class: 'prose max-w-none focus:outline-none p-4 min-h-[200px]',
+        class: "prose max-w-none focus:outline-none p-4 min-h-[200px]",
       },
     },
   });
@@ -273,13 +297,17 @@ const CertificationForm = ({ isEdit = false }) => {
         if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data);
 
         if (isEdit) {
-          const certRes = await axios.get(`${BASE_URL}/api/certifications/${id}`);
+          const certRes = await axios.get(
+            `${BASE_URL}/api/certifications/${id}`
+          );
           if (certRes.data.success) {
             const cert = certRes.data.data;
             setFormData({
               name: cert.name,
+              shortDescription: cert.shortDescription,
               description: cert.description,
               certificationType: cert.certificationType,
+              callToAction: cert.callToAction,
               fields: cert.fields.map((f) => f._id),
               durationInMonths: cert.durationInMonths || 12,
             });
@@ -308,24 +336,45 @@ const CertificationForm = ({ isEdit = false }) => {
         ? prev.fields.filter((id) => id !== fieldId)
         : [...prev.fields, fieldId],
     }));
-  };
-
-  const handleSubmit = async (e) => {
+  };const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Validate required fields
+    const requiredFields = [
+      "name",
+      "shortDescription",
+      "description",
+      "certificationType",
+      "callToAction",
+    ];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        setError(`${field} is required`);
+        toast.error(`${field} is required`);
+        return;
+      }
+    }
+  
+    if (!formData.fields || formData.fields.length === 0) {
+      setError("At least one field is required");
+      toast.error("At least one field is required");
+      return;
+    }
+  
     setLoading(true);
     setError(null);
-
+  
     try {
       const url = isEdit
         ? `${BASE_URL}/api/certifications/${id}`
         : `${BASE_URL}/api/certifications`;
       const method = isEdit ? "put" : "post";
-
+  
       const response = await axios[method](url, {
         ...formData,
         description: editor?.getHTML() || formData.description,
       });
-
+  
       if (response.data.success) {
         toast.success(
           isEdit
@@ -335,7 +384,9 @@ const CertificationForm = ({ isEdit = false }) => {
         navigate("/admin/certifications");
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "An error occurred";
+      const errorMessage =
+        error.response?.data?.errors?.join(", ") || error.response?.data?.message || "An error occurred";
+  
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -376,18 +427,32 @@ const CertificationForm = ({ isEdit = false }) => {
 
           <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">
+              Short Description <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              name="shortDescription"
+              value={formData.shortDescription}
+              onChange={handleChange}
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+              required
+              disabled={loading}
+              rows={3}
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-gray-700 mb-2">
               Description <span className="text-red-500">*</span>
             </label>
             <div className="border rounded-lg overflow-hidden">
               <MenuBar editor={editor} />
-              <EditorContent 
-                editor={editor} 
+              <EditorContent
+                editor={editor}
                 className="min-h-[200px] border-t"
                 disabled={loading}
               />
             </div>
           </div>
-
 
           <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">
@@ -423,21 +488,41 @@ const CertificationForm = ({ isEdit = false }) => {
 
           <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">Fields</label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {availableFields.map((field) => (
-                <label key={field._id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.fields.includes(field._id)}
-                    onChange={() => handleFieldToggle(field._id)}
-                    className="mr-2"
-                    disabled={loading}
-                  />
-                  {field.name}
-                </label>
-              ))}
-            </div>
+            {availableFields.length === 0 ? (
+              <div className="text-gray-500">Loading fields...</div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {availableFields.map((field) => (
+                  <label key={field._id} className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.fields.includes(field._id)}
+                      onChange={() => handleFieldToggle(field._id)}
+                      className="mr-2"
+                      disabled={loading}
+                    />
+                    {field.name}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-gray-700 mb-2 mt-6">
+            Call To Action <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="callToAction"
+            value={formData.callToAction}
+            onChange={handleChange}
+            className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            required
+            disabled={loading}
+            placeholder="e.g., 'Get Certified Today'"
+          />
         </div>
 
         <div className="mt-6 flex justify-end space-x-4">

@@ -36,7 +36,7 @@ const CertificationCardList = () => {
         if (typeFilter) params.append("type", typeFilter);
 
         const [certsRes, typesRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/certifications?${params}`),
+          axios.get(`${BASE_URL}/api/certifications/public/list?${params}`),
           axios.get(`${BASE_URL}/api/certifications/types/list`),
         ]);
 

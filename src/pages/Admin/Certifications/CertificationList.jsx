@@ -5,20 +5,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../../../secrets";
 
-// Helper function to strip HTML tags and limit words
-const formatDescription = (html, wordLimit = 10) => {
-  if (!html) return '';
-  
-  // Remove HTML tags
-  const plainText = html.replace(/<[^>]*>/g, '');
-  
-  // Split into words and limit
-  const words = plainText.split(/\s+/);
-  if (words.length <= wordLimit) return plainText;
-  
-  return words.slice(0, wordLimit).join(' ') + '...';
-};
-
 const CertificationList = () => {
   const [certifications, setCertifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,11 +14,13 @@ const CertificationList = () => {
   const [fieldFilter, setFieldFilter] = useState("");
   const [availableTypes, setAvailableTypes] = useState([]);
   const [availableFields, setAvailableFields] = useState([]);
+  const [filterLoading, setFilterLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        setFilterLoading(true);
 
         // Fetch certifications with filters
         const params = new URLSearchParams();
@@ -55,6 +43,7 @@ const CertificationList = () => {
             (error.response?.data?.message || error.message)
         );
       } finally {
+        setFilterLoading(false);
         setLoading(false);
       }
     };
@@ -116,29 +105,31 @@ const CertificationList = () => {
         <h1 className="text-2xl font-bold">Certification Management</h1>
         <Link
           to="/admin/certifications/add"
-          className="bg-blue-600 text-white px-4 py-2 rounded flex items-center hover:bg-blue-700 transition-colors"
-        >
+          className="bg-blue-600 text-white px-4 py-2 rounded flex items-center hover:bg-blue-700 transition-colors">
           <FaPlus className="mr-2" /> Add Certification
         </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="relative">
-          <FaSearch className="absolute left-3 top-3 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search certifications..."
-            className="pl-10 pr-4 py-2 border rounded w-full focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+  <div className="relative">
+    <FaSearch className="absolute left-3 top-3 text-gray-400" />
+    <input
+      type="text"
+      placeholder="Search certifications..."
+      className="pl-10 pr-4 py-2 border rounded w-full focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      disabled={filterLoading}
+    />
+    {filterLoading && (
+      <FaSpinner className="absolute right-3 top-3 animate-spin text-gray-400" />
+    )}
+  </div>
 
         <select
           className="p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-        >
+          onChange={(e) => setTypeFilter(e.target.value)}>
           <option value="">All Types</option>
           {availableTypes.map((type) => (
             <option key={type} value={type}>
@@ -150,8 +141,7 @@ const CertificationList = () => {
         <select
           className="p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           value={fieldFilter}
-          onChange={(e) => setFieldFilter(e.target.value)}
-        >
+          onChange={(e) => setFieldFilter(e.target.value)}>
           <option value="">All Fields</option>
           {availableFields.map((field) => (
             <option key={field._id} value={field._id}>
@@ -163,7 +153,8 @@ const CertificationList = () => {
 
       {certifications.length === 0 ? (
         <div className="bg-white p-6 rounded-lg shadow text-center text-gray-500">
-          No certifications found. Try adjusting your filters or add a new certification.
+          No certifications found. Try adjusting your filters or add a new
+          certification.
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -174,6 +165,7 @@ const CertificationList = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Name
                   </th>
+
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Type
                   </th>
@@ -196,7 +188,16 @@ const CertificationList = () => {
                         {cert.name}
                       </div>
                       <div className="text-gray-500 text-sm mt-1">
-                        {formatDescription(cert.description)}
+                        {/* Limit shortDescription to 15 words */}
+                        {cert.shortDescription
+                          ? cert.shortDescription
+                              .split(" ")
+                              .slice(0, 18)
+                              .join(" ") +
+                            (cert.shortDescription.split(" ").length > 18
+                              ? "..."
+                              : "")
+                          : ""}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -209,8 +210,7 @@ const CertificationList = () => {
                         {cert.fields?.map((field) => (
                           <span
                             key={field._id}
-                            className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800"
-                          >
+                            className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
                             {field.name}
                           </span>
                         ))}
@@ -223,16 +223,16 @@ const CertificationList = () => {
                       <Link
                         to={`/admin/certifications/edit/${cert._id}`}
                         className="text-blue-600 hover:text-blue-900 mr-4 inline-block p-1 hover:bg-blue-50 rounded"
-                        title="Edit"
-                      >
+                        title="Edit">
                         <FaEdit />
                       </Link>
                       <button
                         onClick={() => handleDelete(cert._id)}
                         className="text-red-600 hover:text-red-900 inline-block p-1 hover:bg-red-50 rounded"
                         disabled={deletingId === cert._id}
-                        title={deletingId === cert._id ? "Deleting..." : "Delete"}
-                      >
+                        title={
+                          deletingId === cert._id ? "Deleting..." : "Delete"
+                        }>
                         {deletingId === cert._id ? (
                           <FaSpinner className="animate-spin" />
                         ) : (
