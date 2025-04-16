@@ -5,6 +5,7 @@ import AdminLayout from "../components/AdminLayout";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import CertificationList from "../pages/Admin/Certifications/CertificationList";
 import CertificationForm from "../pages/Admin/Certifications/CertificationForm";
+import CertificationView from "../pages/Admin/Certifications/CertificationView";
 import TrainingList from "../pages/Admin/Trainings/TrainingList";
 import TrainingForm from "../pages/Admin/Trainings/TrainingForm";
 import CompanyList from "../pages/Admin/Companies/CompanyList";
@@ -83,6 +84,7 @@ const AppRoutes = () => {
           <Route index element={<CertificationList />} />
           <Route path="add" element={<CertificationForm />} />
           <Route path="edit/:id" element={<CertificationForm isEdit />} />
+          <Route path="view/:id" element={<CertificationView />} />
         </Route>
 
         {/* Trainings routes */}
