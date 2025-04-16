@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaSpinner, FaEye } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Pagination from "../../../components/Pagination";
 import { BASE_URL } from "../../../secrets";
 
 const CertificationList = () => {
@@ -78,7 +79,7 @@ const CertificationList = () => {
           fields: fieldsRes.data.data
         }));
       } catch (err) {
-        toast.error('Failed to fetch filter options');
+        toast.error(`Failed to fetch filter options: ${err.message}`);
       }
     };
 
@@ -155,36 +156,6 @@ const CertificationList = () => {
         >
           Reset Filters
         </button>
-      </div>
-    </div>
-  );
-
-  const Pagination = () => (
-    <div className="flex justify-between items-center px-4 py-3 bg-gray-50 border-t border-gray-200 sm:px-6">
-      <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm text-gray-700">
-            Showing page <span className="font-medium">{currentPage}</span> of{' '}
-            <span className="font-medium">{totalPages}</span>
-          </p>
-        </div>
-        <div>
-          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => fetchCertifications(i + 1)}
-                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                  currentPage === i + 1
-                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </nav>
-        </div>
       </div>
     </div>
   );
@@ -320,13 +291,13 @@ const CertificationList = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
-                                                    <Link
-                                                      to={`/admin/certifications/view/${cert._id}`}
-                                                      className="text-blue-600 hover:text-blue-900"
-                                                      title="View"
-                                                    >
-                                                      <FaEye className="h-5 w-5" />
-                                                    </Link>
+                          <Link
+                            to={`/admin/certifications/view/${cert._id}`}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="View"
+                          >
+                            <FaEye className="h-5 w-5" />
+                          </Link>
                           <Link
                             to={`/admin/certifications/edit/${cert._id}`}
                             className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
@@ -348,7 +319,19 @@ const CertificationList = () => {
                 </tbody>
               </table>
             </div>
-            {totalPages > 1 && <Pagination />}
+            
+            {/* Using the Pagination component */}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                  setState(prev => ({ ...prev, currentPage: page }));
+                  fetchCertifications(page);
+                }}
+                className="px-4 py-3 bg-gray-50 border-t border-gray-200"
+              />
+            )}
           </div>
         )}
       </div>

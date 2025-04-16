@@ -329,6 +329,11 @@ const CertificationForm = ({ isEdit = false }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const countWords = (text) => {
+    if (!text.trim()) return 0;
+    return text.trim().split(/\s+/).length;
+  };
+
   const handleFieldToggle = (fieldId) => {
     setFormData((prev) => ({
       ...prev,
@@ -428,7 +433,11 @@ const CertificationForm = ({ isEdit = false }) => {
           <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">
               Short Description <span className="text-red-500">*</span>
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                ({countWords(formData.shortDescription)} words)
+              </span>
             </label>
+
             <textarea
               name="shortDescription"
               value={formData.shortDescription}
@@ -438,7 +447,19 @@ const CertificationForm = ({ isEdit = false }) => {
               disabled={loading}
               rows={3}
             />
+
+            {countWords(formData.shortDescription) < 10 && (
+              <p className="text-sm text-yellow-600 mt-1">
+                Minimum 10 words recommended
+              </p>
+            )}
+            {countWords(formData.shortDescription) > 20 && (
+              <p className="text-sm text-yellow-600 mt-1">
+                Maximum 20 words recommended
+              </p>
+            )}
           </div>
+
 
           <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">
@@ -487,7 +508,7 @@ const CertificationForm = ({ isEdit = false }) => {
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-gray-700 mb-2">Fields</label>
+            <label className="block text-gray-700 mb-2">Fields <span className="text-red-500">*</span></label>
             {availableFields.length === 0 ? (
               <div className="text-gray-500">Loading fields...</div>
             ) : (

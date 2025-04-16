@@ -8,6 +8,7 @@ import {
 } from 'react-icons/fa';
 import axios from 'axios';
 import { BASE_URL } from "../../../secrets";
+import Pagination from '../../../components/Pagination';
 
 const CompanyList = () => {
   const [companies, setCompanies] = useState([]);
@@ -358,13 +359,13 @@ const CompanyList = () => {
       {/* Companies list */}
       {loading && companies.length === 0 ? (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      ) : companies.length === 0 ? (
-        renderEmptyState()
-      ) : (
-        <>
-          <div className="overflow-x-auto">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    ) : companies.length === 0 ? (
+      renderEmptyState()
+    ) : (
+      <>
+        <div className="overflow-x-auto">
             <table className="min-w-full bg-white">
               <thead className="bg-gray-50">
                 <tr>
@@ -476,56 +477,16 @@ const CompanyList = () => {
           </div>
           
           {/* Pagination */}
-          <div className="flex justify-between items-center mt-6">
-            <div className="text-sm text-gray-700">
-              Showing <span className="font-medium">{companies.length}</span> of{' '}
-              <span className="font-medium">{totalCompanies}</span> results
-            </div>
-            
-            <div className="flex space-x-2">
-              <button
-                onClick={() => !loading && setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1 || loading}
-                className={`px-3 py-1 rounded ${
-                  currentPage === 1 || loading
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-                }`}
-              >
-                Previous
-              </button>
-              
-              {/* Page numbers */}
-              <div className="flex space-x-1">
-                {[...Array(totalPages).keys()].map(page => (
-                  <button
-                    key={page + 1}
-                    onClick={() => !loading && setCurrentPage(page + 1)}
-                    disabled={loading}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === page + 1
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    } ${loading ? 'cursor-not-allowed' : ''}`}
-                  >
-                    {page + 1}
-                  </button>
-                ))}
-              </div>
-              
-              <button
-                onClick={() => !loading && setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages || loading}
-                className={`px-3 py-1 rounded ${
-                  currentPage === totalPages || loading
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-                }`}
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => {
+              if (!loading) {
+                setCurrentPage(page);
+              }
+            }}
+            className="mt-6"
+          />
         </>
       )}
     </div>

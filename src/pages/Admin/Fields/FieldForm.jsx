@@ -15,7 +15,7 @@ const FieldForm = ({ isEdit = false }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (isEdit) {
+    if (isEdit && id) {
       const fetchField = async () => {
         try {
           setLoading(true);
@@ -27,15 +27,17 @@ const FieldForm = ({ isEdit = false }) => {
             });
           }
         } catch (error) {
-          setError(error.response?.data?.message || "Failed to fetch field");
-          toast.error(error.response?.data?.message || "Failed to fetch field");
+          const errorMsg = error.response?.data?.message || "Failed to fetch field";
+          setError(errorMsg);
+          toast.error(errorMsg);
+          navigate("/admin/fields", { replace: true });
         } finally {
           setLoading(false);
         }
       };
       fetchField();
     }
-  }, [isEdit, id]);
+  }, [isEdit, id, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,11 +66,18 @@ const FieldForm = ({ isEdit = false }) => {
         navigate("/admin/fields");
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 
-        (error.code === 11000 
-          ? "Field with this name already exists" 
-          : "An error occurred");
+      let errorMessage = "An error occurred";
       
+      if (error.response) {
+        if (error.response.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data?.references) {
+          errorMessage = "Cannot modify: Field is referenced elsewhere";
+        }
+      } else if (error.code === 11000) {
+        errorMessage = "Field with this name already exists";
+      }
+
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -77,11 +86,15 @@ const FieldForm = ({ isEdit = false }) => {
   };
 
   if (loading && isEdit) {
-    return <div className="p-6">Loading field data...</div>;
+    return (
+      <div className="p-6 flex justify-center items-center h-64">
+        <div className="text-lg">Loading field data...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">
         {isEdit ? "Edit Field" : "Add New Field"}
       </h1>
@@ -103,10 +116,15 @@ const FieldForm = ({ isEdit = false }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required
+              minLength="2"
+              maxLength="100"
               disabled={loading}
             />
+            <p className="mt-1 text-sm text-gray-500">
+              Between 2-100 characters
+            </p>
           </div>
 
           <div>
@@ -116,9 +134,13 @@ const FieldForm = ({ isEdit = false }) => {
               value={formData.description}
               onChange={handleChange}
               rows="3"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              maxLength="500"
               disabled={loading}
             />
+            <p className="mt-1 text-sm text-gray-500">
+              Max 500 characters
+            </p>
           </div>
         </div>
 
@@ -126,18 +148,24 @@ const FieldForm = ({ isEdit = false }) => {
           <button
             type="button"
             onClick={() => navigate("/admin/fields")}
-            className="px-4 py-2 border rounded text-gray-700"
+            className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50 transition"
             disabled={loading}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-blue-400"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:bg-blue-400"
             disabled={loading}
           >
             {loading ? (
-              "Processing..."
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </span>
             ) : isEdit ? (
               "Update Field"
             ) : (
