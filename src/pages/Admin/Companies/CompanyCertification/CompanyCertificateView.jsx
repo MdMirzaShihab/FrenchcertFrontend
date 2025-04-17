@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { 
   FaCertificate, 
@@ -16,7 +16,6 @@ import { BASE_URL } from "../../../../secrets";
 
 const CompanyCertificateView = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

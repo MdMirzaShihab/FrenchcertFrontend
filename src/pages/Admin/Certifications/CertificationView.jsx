@@ -17,7 +17,7 @@ const CertificationView = () => {
         const response = await axios.get(`${BASE_URL}/api/certifications/${id}`);
         setCertification(response.data.data);
       } catch (error) {
-        toast.error('Failed to fetch certification');
+        toast.error(`Failed to fetch certification, ${error.message}`);
         navigate('/admin/certifications');
       } finally {
         setLoading(false);
