@@ -6,19 +6,15 @@ import { BASE_URL } from "../../../secrets";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
-import TextStyle from "@tiptap/extension-text-style";
-import Color from "@tiptap/extension-color";
 import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import {
   FaBold,
   FaItalic,
   FaUnderline,
-  FaHeading,
   FaListUl,
   FaListOl,
   FaLink,
-  FaPalette,
   FaUndo,
   FaRedo,
   FaAlignLeft,
@@ -194,22 +190,6 @@ const MenuBar = ({ editor }) => {
         <FaLink />
       </button>
 
-      {/* Text Color */}
-      <div className="h-6 w-px bg-gray-300 mx-1"></div>
-      <div className="flex items-center">
-        <label htmlFor="text-color" className="p-2 text-gray-700">
-          <FaPalette />
-        </label>
-        <input
-          id="text-color"
-          type="color"
-          onInput={(e) => editor.chain().focus().setColor(e.target.value).run()}
-          value={editor.getAttributes("textStyle").color || "#000000"}
-          className="h-8 w-8 cursor-pointer border rounded"
-          title="Text Color"
-        />
-      </div>
-
       {/* Undo/Redo */}
       <div className="h-6 w-px bg-gray-300 mx-1"></div>
       <button
@@ -258,8 +238,6 @@ const CertificationForm = ({ isEdit = false }) => {
         },
       }),
       Underline,
-      TextStyle,
-      Color,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -294,7 +272,7 @@ const CertificationForm = ({ isEdit = false }) => {
       try {
         setLoading(true);
         const fieldsRes = await axios.get(`${BASE_URL}/api/fields`);
-        if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data);
+        if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data?.fields );
 
         if (isEdit) {
           const certRes = await axios.get(

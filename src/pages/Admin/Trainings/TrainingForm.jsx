@@ -33,7 +33,7 @@ const TrainingForm = ({ isEdit = false }) => {
         ]);
         
         if (methodsRes.data.success) setAvailableMethods(methodsRes.data.data);
-        if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data);
+        if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data?.fields );
         
         if (isEdit) {
           const trainingRes = await axios.get(`${BASE_URL}/api/trainings/${id}`);

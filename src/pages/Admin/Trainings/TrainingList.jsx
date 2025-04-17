@@ -40,7 +40,7 @@ const TrainingList = () => {
         if (trainingsRes.data.success) setTrainings(trainingsRes.data.data);
         if (typesRes.data.success) setAvailableTypes(typesRes.data.data);
         if (methodsRes.data.success) setAvailableMethods(methodsRes.data.data);
-        if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data);
+        if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data?.fields);
         
       } catch (error) {
         toast.error("Failed to fetch data: " + (error.response?.data?.message || error.message));

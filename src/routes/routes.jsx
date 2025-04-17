@@ -16,6 +16,8 @@ import CompanyCertificateView from "../pages/Admin/Companies/CompanyCertificatio
 import AddTrainingToCompany from "../pages/Admin/Companies/AddTrainingToCompany";
 import FieldForm from "../pages/Admin/Fields/FieldForm";
 import FieldList from "../pages/Admin/Fields/FieldList";
+import FieldView from "../pages/Admin/Fields/FieldView";
+
 
 import HomePage from "../pages/HomePage";
 import ValidateCertificate from "../pages/ValidateCertificate";
@@ -28,6 +30,7 @@ import Contact from "../pages/Contact/Contact";
 import JoinUs from "../pages/JoinUs/JoinUs";
 import Process from "../pages/Processes/Processes";
 import Accreditations from "../pages/Accreditations/Accreditations";
+
 
 import ISO9001 from "../pages/Services/ISO9001";
 import ISO14001 from "../pages/Services/ISO14001";
@@ -120,6 +123,7 @@ const AppRoutes = () => {
           <Route index element={<FieldList />} />
           <Route path="add" element={<FieldForm />} />
           <Route path="edit/:id" element={<FieldForm isEdit />} />
+          <Route path="view/:id" element={<FieldView />} />
         </Route>
       </Route>
     </Routes>

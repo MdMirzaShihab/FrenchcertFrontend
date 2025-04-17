@@ -19,7 +19,6 @@ const CompanyList = () => {
     categories: [],
     fields: []
   });
-  const [totalCompanies, setTotalCompanies] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
@@ -52,7 +51,7 @@ const CompanyList = () => {
         setFilterOptions({
           countries: countriesRes.data.success ? countriesRes.data.data : [],
           categories: categoriesRes.data.success ? categoriesRes.data.data : [],
-          fields: fieldsRes.data.success ? fieldsRes.data.data : []
+          fields: fieldsRes.data.success ? fieldsRes.data.data?.fields  : []
         });
       } catch (error) {
         toast.error('Failed to load filter options');
@@ -92,7 +91,6 @@ const CompanyList = () => {
         
         if (response.data.success) {
           setCompanies(response.data.data);
-          setTotalCompanies(response.data.total);
           setTotalPages(response.data.pages);
           setCurrentPage(response.data.currentPage);
         } else {

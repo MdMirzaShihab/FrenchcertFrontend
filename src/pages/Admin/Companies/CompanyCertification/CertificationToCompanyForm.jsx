@@ -43,12 +43,13 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
         setError(null);
 
         // Fetch available certifications
-        const certsResponse = await axios.get(`${BASE_URL}/api/certifications`);
+        const certsResponse = await axios.get(`${BASE_URL}/api/certifications/dropdown`);
         if (certsResponse.data.success) {
           setAvailableCertifications(certsResponse.data.data);
         } else {
-          throw new Error("Failed to load certifications");
+          throw new Error(certsResponse.data.message || "Failed to load certifications");
         }
+    
 
         // Fetch company details
         const companyResponse = await axios.get(
@@ -256,19 +257,20 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             Certification Type <span className="text-red-500">*</span>
           </label>
           <select
-            name="certification"
-            value={formData.certification}
-            onChange={handleChange}
-            required
-            disabled={isEdit} // Disable in edit mode to prevent changing certification
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
-            <option value="">Select a Certification</option>
-            {availableCertifications.map((cert) => (
-              <option key={cert._id} value={cert._id}>
-                {cert.name} - {cert.issuedBy}
-              </option>
-            ))}
-          </select>
+  name="certification"
+  value={formData.certification}
+  onChange={handleChange}
+  required
+  disabled={isEdit}
+  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+>
+  <option value="">Select a Certification</option>
+  {availableCertifications.map((cert) => (
+    <option key={cert._id} value={cert._id}>
+      {cert.name}
+    </option>
+  ))}
+</select>
         </div>
 
         {/* Dates - Two Column Layout */}

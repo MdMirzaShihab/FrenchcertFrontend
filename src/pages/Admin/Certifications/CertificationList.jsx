@@ -76,7 +76,7 @@ const CertificationList = () => {
         setState(prev => ({
           ...prev,
           certificationTypes: typesRes.data.data,
-          fields: fieldsRes.data.data
+          fields:  fieldsRes.data.data?.fields 
         }));
       } catch (err) {
         toast.error(`Failed to fetch filter options: ${err.message}`);

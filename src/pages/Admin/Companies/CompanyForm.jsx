@@ -84,7 +84,7 @@ const CompanyForm = () => {
       try {
         const response = await axios.get(`${BASE_URL}/api/fields`);
         if (response.data.success) {
-          setFields(response.data.data);
+          setFields(response.data.data?.fields );
         }
       } catch (error) {
         toast.error(`Failed to load fields ${error.message}`);
