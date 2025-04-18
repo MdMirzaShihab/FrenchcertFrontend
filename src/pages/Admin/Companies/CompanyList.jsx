@@ -1,492 +1,416 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { 
-  FaBuilding, FaSearch, FaFilter, FaEdit, FaEye, FaTrash, 
-  FaGlobe, FaTag, FaUsers, FaSortAmountDown, FaSortAmountUp, 
-  FaSync, FaExclamationTriangle
-} from 'react-icons/fa';
-import axios from 'axios';
+import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { FaBuilding, FaPlus, FaSearch, FaEdit, FaTrash, FaSpinner, FaEye, FaGlobe, FaTag, FaUsers } from "react-icons/fa";
+import axios from "axios";
+import { toast } from "react-toastify";
+import Pagination from "../../../components/Pagination";
 import { BASE_URL } from "../../../secrets";
-import Pagination from '../../../components/Pagination';
 
 const CompanyList = () => {
-  const [companies, setCompanies] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [filterOptions, setFilterOptions] = useState({
+  // State management
+  const [state, setState] = useState({
+    companies: [],
+    loading: true,
+    searchTerm: '',
+    currentPage: 1,
+    totalPages: 1,
     countries: [],
     categories: [],
-    fields: []
-  });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const navigate = useNavigate();
-
-  // Filters and search
-  const [filters, setFilters] = useState({
-    search: '',
-    country: '',
-    category: '',
-    field: '',
+    fields: [],
+    selectedCountry: '',
+    selectedCategory: '',
+    selectedField: '',
     minEmployees: '',
-    maxEmployees: ''
+    maxEmployees: '',
+    error: null
   });
 
-  // Sort options
-  const [sortField, setSortField] = useState('name');
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [showFilters, setShowFilters] = useState(false);
+  // Destructure state for cleaner code
+  const { 
+    companies, 
+    loading, 
+    searchTerm, 
+    currentPage, 
+    totalPages, 
+    countries, 
+    categories, 
+    fields, 
+    selectedCountry, 
+    selectedCategory,
+    selectedField,
+    minEmployees,
+    maxEmployees,
+    error 
+  } = state;
 
+  // Memoized fetch function with enhanced search
+  const fetchCompanies = useCallback(async (page = 1) => {
+    try {
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      const params = {
+        page,
+        limit: 10,
+        ...(searchTerm && { search: searchTerm }),
+        ...(selectedCountry && { country: selectedCountry }),
+        ...(selectedCategory && { category: selectedCategory }),
+        ...(selectedField && { field: selectedField }),
+        ...(minEmployees && { minEmployees: parseInt(minEmployees) }),
+        ...(maxEmployees && { maxEmployees: parseInt(maxEmployees) })
+      };
+
+      const response = await axios.get(`${BASE_URL}/api/companies`, { params });
+      
+      setState(prev => ({
+        ...prev,
+        companies: response.data.data,
+        totalPages: response.data.pages,
+        currentPage: page,
+        loading: false
+      }));
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Failed to fetch companies';
+      setState(prev => ({ ...prev, loading: false, error: errorMsg }));
+      toast.error(errorMsg);
+    }
+  }, [searchTerm, selectedCountry, selectedCategory, selectedField, minEmployees, maxEmployees]);
+
+  // Initial data fetch
   useEffect(() => {
-    const fetchFilterOptions = async () => {
+    const fetchInitialData = async () => {
       try {
-        setLoading(true);
         const [countriesRes, categoriesRes, fieldsRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/companies/countries/list`),
           axios.get(`${BASE_URL}/api/companies/categories/list`),
           axios.get(`${BASE_URL}/api/fields`)
         ]);
         
-        setFilterOptions({
-          countries: countriesRes.data.success ? countriesRes.data.data : [],
-          categories: categoriesRes.data.success ? categoriesRes.data.data : [],
-          fields: fieldsRes.data.success ? fieldsRes.data.data?.fields  : []
-        });
-      } catch (error) {
-        toast.error('Failed to load filter options');
-        console.error('Filter options error:', error);
-      } finally {
-        setLoading(false);
+        setState(prev => ({
+          ...prev,
+          countries: countriesRes.data.data || [],
+          categories: categoriesRes.data.data || [],
+          fields: fieldsRes.data.data?.fields || []
+        }));
+      } catch (err) {
+        toast.error(`Failed to fetch filter options: ${err.message}`);
       }
     };
-    
-    fetchFilterOptions();
+
+    fetchInitialData();
   }, []);
 
+  // Fetch companies when filters change
   useEffect(() => {
-    const fetchCompanies = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const params = {
-          search: filters.search,
-          country: filters.country,
-          category: filters.category,
-          field: filters.field,
-          minEmployees: filters.minEmployees,
-          maxEmployees: filters.maxEmployees,
-          page: currentPage,
-          limit: 10,
-          sort: sortField,
-          order: sortDirection
-        };
+    const timer = setTimeout(() => {
+      fetchCompanies(1);
+    }, 500); // Increased debounce time for better search experience
 
-        // Remove empty params
-        Object.keys(params).forEach(key => {
-          if (!params[key]) delete params[key];
-        });
+    return () => clearTimeout(timer);
+  }, [fetchCompanies]);
 
-        const response = await axios.get(`${BASE_URL}/api/companies`, { params });
-        
-        if (response.data.success) {
-          setCompanies(response.data.data);
-          setTotalPages(response.data.pages);
-          setCurrentPage(response.data.currentPage);
-        } else {
-          setError(response.data.message || 'Failed to fetch companies');
-        }
-      } catch (error) {
-        const errorMessage = error.response?.data?.message || 
-                          error.message || 
-                          'Failed to fetch companies';
-        setError(errorMessage);
-        toast.error(errorMessage);
-        console.error('Fetch companies error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const debounceTimer = setTimeout(() => {
-      fetchCompanies();
-    }, 300); // Debounce to prevent rapid API calls
-
-    return () => clearTimeout(debounceTimer);
-  }, [filters, currentPage, sortField, sortDirection]);
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({
+  // Handlers
+  const handleResetFilters = () => {
+    setState(prev => ({
       ...prev,
-      [name]: value
-    }));
-    setCurrentPage(1);
-  };
-
-  const resetFilters = () => {
-    setFilters({
-      search: '',
-      country: '',
-      category: '',
-      field: '',
+      searchTerm: '',
+      selectedCountry: '',
+      selectedCategory: '',
+      selectedField: '',
       minEmployees: '',
-      maxEmployees: ''
-    });
-    setCurrentPage(1);
+      maxEmployees: '',
+      currentPage: 1
+    }));
   };
 
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
-  const handleDeleteCompany = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this company? This action cannot be undone.')) {
-      return;
-    }
-    
-    try {
-      const response = await axios.delete(`${BASE_URL}/api/companies/${id}`);
-      
-      if (response.data.success) {
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this company and all its associated data?')) {
+      try {
+        await axios.delete(`${BASE_URL}/api/companies/${id}`);
         toast.success('Company deleted successfully');
-        // Re-fetch companies but keep current filters
-        setCurrentPage(prev => Math.min(prev, Math.max(1, totalPages - 1)));
-      } else {
-        toast.error(response.data.message || 'Failed to delete company');
+        fetchCompanies(currentPage);
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to delete company');
       }
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 
-                        error.message || 
-                        'Failed to delete company';
-      toast.error(errorMessage);
-      console.error('Delete company error:', error);
     }
   };
 
-  const renderSortIcon = (field) => {
-    if (sortField !== field) return null;
-    return sortDirection === 'asc' 
-      ? <FaSortAmountUp className="ml-1 inline" /> 
-      : <FaSortAmountDown className="ml-1 inline" />;
+  // Validate employee count inputs
+  const handleEmployeeCountChange = (e) => {
+    const { name, value } = e.target;
+    if (value === '' || (!isNaN(value) && parseInt(value) >= 0)) {
+      setState(prev => ({ ...prev, [name]: value }));
+    }
   };
 
-  const renderEmptyState = () => {
-    if (error) {
-      return (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-8 text-center">
-          <FaExclamationTriangle className="mx-auto text-yellow-500 text-4xl mb-4" />
-          <h3 className="text-lg font-medium text-yellow-800 mb-2">Error Loading Companies</h3>
-          <p className="text-yellow-600 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 transition-colors"
-          >
-            Retry
-          </button>
+  // UI Components
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center py-12">
+      <FaSpinner className="animate-spin text-4xl text-blue-500" />
+    </div>
+  );
+
+  const ErrorMessage = () => (
+    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+      <div className="flex">
+        <div className="flex-shrink-0">
+          <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
         </div>
-      );
-    }
-
-    return (
-      <div className="bg-gray-50 border border-dashed border-gray-300 rounded-md p-8 text-center">
-        <FaBuilding className="mx-auto text-gray-400 text-4xl mb-4" />
-        <h3 className="text-lg font-medium text-gray-700 mb-2">No Companies Found</h3>
-        <p className="text-gray-500 mb-4">
-          {Object.values(filters).some(val => val !== '') 
-            ? 'Try adjusting your filters to see more results' 
-            : 'Start by adding a new company'}
-        </p>
-        {Object.values(filters).some(val => val !== '') && (
-          <button
-            onClick={resetFilters}
-            className="px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors"
-          >
-            Clear Filters
-          </button>
-        )}
+        <div className="ml-3">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
       </div>
-    );
-  };
+    </div>
+  );
+
+  const EmptyState = () => (
+    <div className="bg-white p-8 rounded-lg shadow text-center">
+      <FaBuilding className="mx-auto h-12 w-12 text-gray-400" />
+      <h3 className="mt-2 text-lg font-medium text-gray-900">No companies found</h3>
+      <p className="mt-1 text-sm text-gray-500">
+        Try adjusting your search or filter to find what you're looking for.
+      </p>
+      <div className="mt-6">
+        <button
+          onClick={handleResetFilters}
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 max-w-7xl mx-auto">
-      {/* Header and buttons */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center mb-4 md:mb-0">
-          <FaBuilding className="mr-2" /> Companies
-          {loading && <span className="ml-2 text-sm text-gray-500">Loading...</span>}
-        </h1>
-        
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            disabled={loading}
-            className={`px-4 py-2 rounded-md flex items-center transition-colors ${
-              loading ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 
-              'bg-blue-100 text-blue-600 hover:bg-blue-200'
-            }`}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex flex-col space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <h1 className="text-2xl font-bold text-gray-900">Company Management</h1>
+          <Link
+            to="/admin/companies/add"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            <FaFilter className="mr-2" />
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
-          </button>
-          
-          <button
-            onClick={() => navigate('/admin/companies/add')}
-            className="px-4 py-2 bg-green-600 text-white rounded-md flex items-center hover:bg-green-700 transition-colors"
-            disabled={loading}
-          >
-            <FaBuilding className="mr-2" /> Add New Company
-          </button>
+            <FaPlus className="mr-2" /> Add Company
+          </Link>
         </div>
-      </div>
-      
-      {/* Search bar */}
-      <div className="mb-6">
-        <div className="relative">
-          <input
-            type="text"
-            name="search"
-            value={filters.search}
-            onChange={handleFilterChange}
-            placeholder="Search companies by name or scope..."
-            className="w-full p-3 pl-10 border border-gray-300 rounded-md disabled:bg-gray-50"
-            disabled={loading}
-          />
-          <FaSearch className="absolute left-3 top-3.5 text-gray-400" />
-        </div>
-      </div>
-      
-      {/* Filters panel */}
-      {showFilters && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-medium text-gray-700">Filter Companies</h3>
-            <button
-              onClick={resetFilters}
-              className="text-blue-600 flex items-center hover:text-blue-800 disabled:text-gray-400"
-              disabled={loading}
+
+        {/* Filters */}
+        <div className="bg-white shadow rounded-lg p-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="h-4 w-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                placeholder="Search companies by name or scope..."
+                value={searchTerm}
+                onChange={(e) => setState(prev => ({ ...prev, searchTerm: e.target.value }))}
+              />
+            </div>
+
+            <select
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              value={selectedCountry}
+              onChange={(e) => setState(prev => ({ ...prev, selectedCountry: e.target.value }))}
             >
-              <FaSync className="mr-1" /> Reset Filters
+              <option value="">All Countries</option>
+              {countries.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              value={selectedCategory}
+              onChange={(e) => setState(prev => ({ ...prev, selectedCategory: e.target.value }))}
+            >
+              <option value="">All Categories</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              value={selectedField}
+              onChange={(e) => setState(prev => ({ ...prev, selectedField: e.target.value }))}
+            >
+              <option value="">All Fields</option>
+              {fields.map((field) => (
+                <option key={field._id} value={field._id}>
+                  {field.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Employee count filters */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mt-4">
+            <div>
+              <label htmlFor="minEmployees" className="block text-sm font-medium text-gray-700 mb-1">
+                Min Employees
+              </label>
+              <input
+                type="number"
+                id="minEmployees"
+                name="minEmployees"
+                min="1"
+                className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md py-2 px-3 border"
+                placeholder="Minimum"
+                value={minEmployees}
+                onChange={handleEmployeeCountChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="maxEmployees" className="block text-sm font-medium text-gray-700 mb-1">
+                Max Employees
+              </label>
+              <input
+                type="number"
+                id="maxEmployees"
+                name="maxEmployees"
+                min="1"
+                className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md py-2 px-3 border"
+                placeholder="Maximum"
+                value={maxEmployees}
+                onChange={handleEmployeeCountChange}
+              />
+            </div>
+          </div>
+          
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={handleResetFilters}
+              className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Reset Filters
             </button>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Origin Country</label>
-              <select
-                name="country"
-                value={filters.country}
-                onChange={handleFilterChange}
-                className="w-full p-2 border border-gray-300 rounded-md disabled:bg-gray-50"
-                disabled={loading}
-              >
-                <option value="">All Countries</option>
-                {filterOptions.countries.map((country, index) => (
-                  <option key={index} value={country}>{country}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <select
-                name="category"
-                value={filters.category}
-                onChange={handleFilterChange}
-                className="w-full p-2 border border-gray-300 rounded-md disabled:bg-gray-50"
-                disabled={loading}
-              >
-                <option value="">All Categories</option>
-                {filterOptions.categories.map((category, index) => (
-                  <option key={index} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Field</label>
-              <select
-                name="field"
-                value={filters.field}
-                onChange={handleFilterChange}
-                className="w-full p-2 border border-gray-300 rounded-md disabled:bg-gray-50"
-                disabled={loading}
-              >
-                <option value="">All Fields</option>
-                {filterOptions.fields.map(field => (
-                  <option key={field._id} value={field._id}>{field.name}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Min Employees</label>
-              <input
-                type="number"
-                name="minEmployees"
-                value={filters.minEmployees}
-                onChange={handleFilterChange}
-                min="1"
-                className="w-full p-2 border border-gray-300 rounded-md disabled:bg-gray-50"
-                disabled={loading}
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Max Employees</label>
-              <input
-                type="number"
-                name="maxEmployees"
-                value={filters.maxEmployees}
-                onChange={handleFilterChange}
-                min="1"
-                className="w-full p-2 border border-gray-300 rounded-md disabled:bg-gray-50"
-                disabled={loading}
-              />
-            </div>
-          </div>
         </div>
-      )}
-      
-      {/* Companies list */}
-      {loading && companies.length === 0 ? (
-        <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    ) : companies.length === 0 ? (
-      renderEmptyState()
-    ) : (
-      <>
-        <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                    onClick={() => !loading && handleSort('name')}
-                  >
-                    <span className="flex items-center">
-                      Company Name {renderSortIcon('name')}
-                    </span>
-                  </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                    onClick={() => !loading && handleSort('originCountry')}
-                  >
-                    <span className="flex items-center">
-                      Country {renderSortIcon('originCountry')}
-                    </span>
-                  </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                    onClick={() => !loading && handleSort('category')}
-                  >
-                    <span className="flex items-center">
-                      Category {renderSortIcon('category')}
-                    </span>
-                  </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                    onClick={() => !loading && handleSort('employeeCount')}
-                  >
-                    <span className="flex items-center">
-                      Employees {renderSortIcon('employeeCount')}
-                    </span>
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {companies.map(company => (
-                  <tr key={company._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <FaBuilding className="text-blue-600" />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{company.name}</div>
-                          <div className="text-sm text-gray-500">ID: {company.companyIdentifier}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <FaGlobe className="mr-1 text-gray-500" />
-                        {company.originCountry}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {company.address?.city}, {company.address?.country}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <FaTag className="mr-1 text-gray-500" />
-                        <span className="text-sm text-gray-900">{company.category}</span>
-                      </div>
-                      {company.scope && (
-                        <div className="text-sm text-gray-500">{company.scope}</div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <FaUsers className="mr-1 text-gray-500" />
-                        <span className="text-sm text-gray-900">{company.employeeCount?.toLocaleString()}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <Link 
-                          to={`/admin/companies/view/${company._id}`}
-                          className="text-blue-600 hover:text-blue-900 disabled:text-gray-400"
-                          title="View Details"
-                        >
-                          <FaEye />
-                        </Link>
-                        <Link 
-                          to={`/admin/companies/edit/${company._id}`}
-                          className="text-green-600 hover:text-green-900 disabled:text-gray-400"
-                          title="Edit Company"
-                        >
-                          <FaEdit />
-                        </Link>
-                        <button
-                          onClick={() => handleDeleteCompany(company._id)}
-                          className="text-red-600 hover:text-red-900 disabled:text-gray-400"
-                          title="Delete Company"
-                          disabled={loading}
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </td>
+
+        {/* Error Message */}
+        {error && <ErrorMessage />}
+
+        {/* Content */}
+        {loading ? (
+          <LoadingSpinner />
+        ) : companies.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Company Details
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Location
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Employees
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {companies.map((company) => (
+                    <tr key={company._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <FaBuilding className="text-blue-600" />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{company.name}</div>
+                            <div className="text-sm text-gray-500">ID: {company.companyIdentifier}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center text-sm text-gray-900">
+                          <FaGlobe className="mr-2 text-gray-400" />
+                          {company.originCountry}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {company.address?.city}, {company.address?.country}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <FaTag className="mr-2 text-gray-400" />
+                          <span className="text-sm text-gray-900">{company.category}</span>
+                        </div>
+                        {company.scope && (
+                          <div className="text-sm text-gray-500">{company.scope}</div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <FaUsers className="mr-2 text-gray-400" />
+                          <span className="text-sm text-gray-900">{company.employeeCount?.toLocaleString()}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <Link
+                            to={`/admin/companies/view/${company._id}`}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="View"
+                          >
+                            <FaEye className="h-5 w-5" />
+                          </Link>
+                          <Link
+                            to={`/admin/companies/edit/${company._id}`}
+                            className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                            title="Edit"
+                          >
+                            <FaEdit className="h-4 w-4" />
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(company._id)}
+                            className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                            title="Delete"
+                          >
+                            <FaTrash className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Using the Pagination component */}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                  setState(prev => ({ ...prev, currentPage: page }));
+                  fetchCompanies(page);
+                }}
+                className="px-4 py-3 bg-gray-50 border-t border-gray-200"
+              />
+            )}
           </div>
-          
-          {/* Pagination */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(page) => {
-              if (!loading) {
-                setCurrentPage(page);
-              }
-            }}
-            className="mt-6"
-          />
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };
