@@ -12,12 +12,6 @@ const FieldView = () => {
   const [field, setField] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [references, setReferences] = useState({
-    certifications: [],
-    trainings: [],
-    companies: []
-  });
-  const [loadingReferences, setLoadingReferences] = useState(true);
 
   useEffect(() => {
     const fetchField = async () => {
@@ -28,7 +22,6 @@ const FieldView = () => {
         
         if (response.data.success) {
           setField(response.data.data);
-          fetchReferences(response.data.data._id);
         } else {
           setError("Field not found");
         }
@@ -38,28 +31,6 @@ const FieldView = () => {
         toast.error(err.response?.data?.message || "Failed to load field data");
       } finally {
         setLoading(false);
-      }
-    };
-
-    const fetchReferences = async (fieldId) => {
-      try {
-        setLoadingReferences(true);
-        const [certRes, trainRes, compRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/certifications?field=${fieldId}&limit=3`),
-          axios.get(`${BASE_URL}/api/trainings?field=${fieldId}&limit=3`),
-          axios.get(`${BASE_URL}/api/companies?field=${fieldId}&limit=3`)
-        ]);
-
-        setReferences({
-          certifications: certRes.data.success ? certRes.data.data.certifications || [] : [],
-          trainings: trainRes.data.success ? trainRes.data.data.trainings || [] : [],
-          companies: compRes.data.success ? compRes.data.data.companies || [] : []
-        });
-      } catch (err) {
-        console.error("Error fetching references:", err);
-        toast.error("Failed to load reference data");
-      } finally {
-        setLoadingReferences(false);
       }
     };
 
@@ -83,22 +54,21 @@ const FieldView = () => {
           `${err.response.data.references.certifications > 0 ? 'certifications, ' : ''}` +
           `${err.response.data.references.trainings > 0 ? 'trainings, ' : ''}` +
           `${err.response.data.references.companies > 0 ? 'companies' : ''}`;
-        errorMsg = errorMsg.replace(/, $/, '');
+        errorMsg = errorMsg.replace(/, $/, ''); // Remove trailing comma if needed
       }
       
       toast.error(errorMsg);
     }
   };
 
-  const ReferenceSection = ({ title, items, type, loading }) => {
-    if (loading) return <div className="text-gray-500">Loading {title.toLowerCase()}...</div>;
+  const ReferenceSection = ({ title, items, type }) => {
     if (!items || items.length === 0) return <div className="text-gray-500">No {title.toLowerCase()} found</div>;
-
+  
     return (
       <div className="space-y-2">
         <h3 className="font-medium text-gray-700">{title}</h3>
         <ul className="space-y-1">
-          {items.slice(0, 3).map(item => (
+          {items.map(item => ( // Removed the .slice(0, 3) here
             <li key={item._id} className="flex items-center">
               <Link 
                 to={`/admin/${type}/view/${item._id}`} 
@@ -110,14 +80,6 @@ const FieldView = () => {
             </li>
           ))}
         </ul>
-        {items.length > 3 && (
-          <Link 
-            to={`/admin/${type}?field=${id}`}
-            className="text-sm text-blue-600 hover:text-blue-800"
-          >
-            View all ({items.length})
-          </Link>
-        )}
       </div>
     );
   };
@@ -176,7 +138,7 @@ const FieldView = () => {
   }
 
   if (!field) {
-    return null; // Shouldn't reach here if error is properly set
+    return null;
   }
 
   return (
@@ -228,25 +190,22 @@ const FieldView = () => {
             <div className="bg-gray-50 p-4 rounded-lg">
               <ReferenceSection 
                 title="Certifications" 
-                items={references.certifications} 
+                items={field.certifications} 
                 type="certifications" 
-                loading={loadingReferences} 
               />
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <ReferenceSection 
                 title="Trainings" 
-                items={references.trainings} 
+                items={field.trainings} 
                 type="trainings" 
-                loading={loadingReferences} 
               />
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <ReferenceSection 
                 title="Companies" 
-                items={references.companies} 
+                items={field.companies} 
                 type="companies" 
-                loading={loadingReferences} 
               />
             </div>
           </div>
