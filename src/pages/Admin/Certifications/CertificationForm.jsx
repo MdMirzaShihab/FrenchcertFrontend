@@ -431,9 +431,9 @@ const CertificationForm = ({ isEdit = false }) => {
                 Minimum 10 words recommended
               </p>
             )}
-            {countWords(formData.shortDescription) > 20 && (
+            {countWords(formData.shortDescription) > 35 && (
               <p className="text-sm text-yellow-600 mt-1">
-                Maximum 20 words recommended
+                Maximum 35 words recommended
               </p>
             )}
           </div>

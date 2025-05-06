@@ -11,6 +11,7 @@ import {
   FaSave,
   FaArrowLeft,
   FaIdCard,
+  FaCalculator,
 } from "react-icons/fa";
 import { BASE_URL } from "../../../../secrets";
 
@@ -21,7 +22,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
   const [formData, setFormData] = useState({
     company: companyId,
     certification: "",
-    certificationId: "", // Add certificationId to form state
+    certificationId: "",
     issueDate: "",
     expiryDate: "",
     firstSurveillanceDate: "",
@@ -35,6 +36,8 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [manualExpiry, setManualExpiry] = useState(false);
+  const [selectedCertDuration, setSelectedCertDuration] = useState(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -42,26 +45,22 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
         setLoading(true);
         setError(null);
 
-        // Fetch available certifications
+        // Fetch available certifications with duration information
         const certsResponse = await axios.get(`${BASE_URL}/api/certifications/dropdown`);
         if (certsResponse.data.success) {
           setAvailableCertifications(certsResponse.data.data);
         } else {
           throw new Error(certsResponse.data.message || "Failed to load certifications");
         }
-    
 
         // Fetch company details
-        const companyResponse = await axios.get(
-          `${BASE_URL}/api/companies/${companyId}`
-        );
+        const companyResponse = await axios.get(`${BASE_URL}/api/companies/${companyId}`);
         if (companyResponse.data.success) {
           setCompanyDetails(companyResponse.data.data);
         } else {
           throw new Error("Failed to load company details");
         }
 
-        // Only fetch certification data if in edit mode
         if (isEdit && certificationId) {
           const certResponse = await axios.get(
             `${BASE_URL}/api/company-certifications/${certificationId}`
@@ -79,18 +78,19 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             setFormData({
               company: certData.company._id,
               certification: certData.certification._id,
-              certificationId: certData.certificationId, // Include certificationId in form data
+              certificationId: certData.certificationId,
               issueDate: formatDateForInput(certData.issueDate),
               expiryDate: formatDateForInput(certData.expiryDate),
-              firstSurveillanceDate: formatDateForInput(
-                certData.firstSurveillanceDate
-              ),
-              secondSurveillanceDate: formatDateForInput(
-                certData.secondSurveillanceDate
-              ),
+              firstSurveillanceDate: formatDateForInput(certData.firstSurveillanceDate),
+              secondSurveillanceDate: formatDateForInput(certData.secondSurveillanceDate),
               status: certData.status,
               notes: certData.notes || "",
             });
+
+            // In edit mode, we consider expiry date as manually set
+            if (certData.expiryDate) {
+              setManualExpiry(true);
+            }
           } else {
             throw new Error("Failed to load certification details");
           }
@@ -117,17 +117,35 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
       ...prev,
       [name]: value,
     }));
+
+    // When certification changes, get its duration
+    if (name === "certification" && value) {
+      const selectedCert = availableCertifications.find(c => c._id === value);
+      setSelectedCertDuration(selectedCert?.durationInMonths || null);
+    }
+  };
+
+  const handleIssueDateChange = (e) => {
+    const issueDate = e.target.value;
+    setFormData(prev => ({ ...prev, issueDate }));
+
+    // Auto-calculate expiry if not manually set and we have duration
+    if (!manualExpiry && selectedCertDuration && issueDate) {
+      const calculatedExpiry = new Date(issueDate);
+      calculatedExpiry.setMonth(calculatedExpiry.getMonth() + selectedCertDuration);
+      calculatedExpiry.setDate(calculatedExpiry.getDate() - 1); // Subtract 1 day
+      setFormData(prev => ({
+        ...prev,
+        expiryDate: calculatedExpiry.toISOString().split("T")[0]
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Basic validation
-    if (
-      !formData.certification ||
-      !formData.issueDate ||
-      !formData.expiryDate
-    ) {
+    if (!formData.certification || !formData.issueDate) {
       toast.error("Please fill out all required fields");
       return;
     }
@@ -141,13 +159,14 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
 
       const method = isEdit ? "put" : "post";
 
-      // For new certifications, if certificationId is empty, let the backend generate it
-      const payload = isEdit 
-        ? formData 
-        : {
-            ...formData,
-            certificationId: formData.certificationId || undefined
-          };
+      // Prepare payload - remove expiryDate if not manually set (let backend calculate)
+      const payload = {
+        ...formData,
+        // For new certifications, if certificationId is empty, let the backend generate it
+        certificationId: isEdit ? formData.certificationId : (formData.certificationId || undefined),
+        // Clear expiry date if not manually set (backend will calculate)
+        expiryDate: manualExpiry ? formData.expiryDate : undefined
+      };
 
       const response = await axios[method](endpoint, payload);
 
@@ -239,13 +258,13 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             name="certificationId"
             value={formData.certificationId}
             onChange={handleChange}
-            required={isEdit} // Required only in edit mode
+            required={isEdit}
             placeholder={isEdit ? "" : "Leave blank to auto-generate"}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
           {!isEdit && (
             <p className="text-xs text-gray-500 mt-1">
-              If left blank, a unique ID will be automatically generated
+              If left blank, a unique ID will be automatically generated (format: FCRT-XXXXXX)
             </p>
           )}
         </div>
@@ -257,20 +276,20 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             Certification Type <span className="text-red-500">*</span>
           </label>
           <select
-  name="certification"
-  value={formData.certification}
-  onChange={handleChange}
-  required
-  disabled={isEdit}
-  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
->
-  <option value="">Select a Certification</option>
-  {availableCertifications.map((cert) => (
-    <option key={cert._id} value={cert._id}>
-      {cert.name}
-    </option>
-  ))}
-</select>
+            name="certification"
+            value={formData.certification}
+            onChange={handleChange}
+            required
+            disabled={isEdit}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+          >
+            <option value="">Select a Certification</option>
+            {availableCertifications.map((cert) => (
+              <option key={cert._id} value={cert._id}>
+                {cert.name} {cert.durationInMonths ? `(${cert.durationInMonths} months)` : ''}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Dates - Two Column Layout */}
@@ -284,25 +303,51 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
               type="date"
               name="issueDate"
               value={formData.issueDate}
-              onChange={handleChange}
+              onChange={handleIssueDateChange}
               required
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              <FaCalendarAlt className="inline mr-1" />
-              Expiry Date <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center mb-1">
+              <label className="block text-sm font-medium text-gray-700">
+                <FaCalendarAlt className="inline mr-1" />
+                Expiry Date
+              </label>
+              <div className="flex items-center ml-3">
+                <input
+                  type="checkbox"
+                  id="manualExpiry"
+                  checked={manualExpiry}
+                  onChange={() => setManualExpiry(!manualExpiry)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="manualExpiry" className="ml-2 block text-xs text-gray-700">
+                  Set manually
+                </label>
+              </div>
+            </div>
             <input
               type="date"
               name="expiryDate"
               value={formData.expiryDate}
               onChange={handleChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              disabled={!manualExpiry}
+              className={`w-full p-2 border rounded-md ${
+                manualExpiry
+                  ? "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                  : "border-gray-200 bg-gray-100 text-gray-500"
+              }`}
             />
+            {!manualExpiry && (
+              <p className="text-xs text-gray-500 mt-1 flex items-center">
+                <FaCalculator className="mr-1" />
+                {selectedCertDuration
+                  ? `Expiry will be automatically calculated (${selectedCertDuration} months from issue date)`
+                  : "Select a certification with duration to auto-calculate expiry"}
+              </p>
+            )}
           </div>
         </div>
 
@@ -354,11 +399,12 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             value={formData.status}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          >
             <option value="active">Active</option>
-            <option value="pending">Pending</option>
             <option value="suspended">Suspended</option>
             <option value="expired">Expired</option>
+            <option value="recertification">Recertification</option>
           </select>
         </div>
 
@@ -374,21 +420,24 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             onChange={handleChange}
             rows="3"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Add any additional notes or comments about this certification"></textarea>
+            placeholder="Add any additional notes or comments about this certification"
+          ></textarea>
         </div>
 
         {/* Form Actions */}
         <div className="flex justify-end space-x-3 pt-4 border-t">
           <Link
             to={`/admin/companies/view/${companyId}`}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+          >
             Cancel
           </Link>
 
           <button
             type="submit"
             disabled={submitting}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center">
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+          >
             {submitting ? (
               <>
                 <FaSpinner className="animate-spin mr-2" />
