@@ -13,7 +13,7 @@ import CompanyForm from "../pages/Admin/Companies/CompanyForm";
 import CompanyView from "../pages/Admin/Companies/CompanyView";
 import CertificationToCompanyForm from "../pages/Admin/Companies/CompanyCertification/CertificationToCompanyForm";
 import CompanyCertificateView from "../pages/Admin/Companies/CompanyCertification/CompanyCertificateView";
-import AddTrainingToCompany from "../pages/Admin/Companies/AddTrainingToCompany";
+import TrainingToCompanyForm from "../pages/Admin/Companies/CompanyTraining/TrainingToCompanyForm";
 import FieldForm from "../pages/Admin/Fields/FieldForm";
 import FieldList from "../pages/Admin/Fields/FieldList";
 import FieldView from "../pages/Admin/Fields/FieldView";
@@ -43,6 +43,8 @@ import IATF16949 from "../pages/Services/IATF16949";
 import EN9100_EN9120 from "../pages/Services/EN9100_EN9120";
 import CertificationCardList from "../pages/Services/CertificationCardList";
 import CertificationDetail from "../pages/Services/CertificationDetail";
+import TrainingView from "../pages/Admin/Trainings/TrainingView";
+import CompanyTrainingView from "../pages/Admin/Companies/CompanyTraining/CompanyTrainingView";
 
 const AppRoutes = () => {
   return (
@@ -95,6 +97,7 @@ const AppRoutes = () => {
           <Route index element={<TrainingList />} />
           <Route path="add" element={<TrainingForm />} />
           <Route path="edit/:id" element={<TrainingForm isEdit />} />
+          <Route path="view/:id" element={<TrainingView />} />
         </Route>
 
         {/* Companies routes */}
@@ -114,8 +117,13 @@ const AppRoutes = () => {
           <Route path="certificate/:id" element={<CompanyCertificateView />} />
           <Route
             path=":companyId/add-training"
-            element={<AddTrainingToCompany/>}
+            element={<TrainingToCompanyForm/>}
           />
+                    <Route
+            path=":companyId/edit-training/:trainingId"
+            element={<TrainingToCompanyForm isEdit />}
+          />
+          <Route path="training/:id" element={<CompanyTrainingView />} />
         </Route>
 
         {/* Fields routes */}

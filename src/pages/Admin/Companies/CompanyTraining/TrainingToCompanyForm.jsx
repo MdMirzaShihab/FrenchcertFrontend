@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import {
-  FaCertificate,
+  FaChalkboardTeacher,
   FaCalendarAlt,
   FaClipboardCheck,
   FaInfoCircle,
@@ -11,35 +11,47 @@ import {
   FaSave,
   FaArrowLeft,
   FaIdCard,
-  FaCalculator,
+  FaUsers,
+  FaLaptop,
+  FaUserFriends,
+  FaBlenderPhone,
 } from "react-icons/fa";
 import { BASE_URL } from "../../../../secrets";
 
-const CertificationToCompanyForm = ({ isEdit = false }) => {
-  const { companyId, certificationId } = useParams();
+const TrainingToCompanyForm = ({ isEdit = false }) => {
+  const { companyId, trainingId } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     company: companyId,
-    certification: "",
-    certificationId: "",
-    issueDate: "",
-    expiryDate: "",
-    firstSurveillanceDate: "",
-    secondSurveillanceDate: "",
-    status: "active",
+    training: "",
+    trainingId: "",
+    trainingDate: "",
+    nextRetrainingDate: "",
+    employeeCount: 1,
+    status: "Completed",
     notes: "",
+    trainingMethod: "online",
+    trainer: "",
+    certificateIssued: false,
+    certificateIssueDate: "",
   });
 
   const [csrfToken, setCsrfToken] = useState('');
-  const [availableCertifications, setAvailableCertifications] = useState([]);
+  const [availableTrainings, setAvailableTrainings] = useState([]);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [manualExpiry, setManualExpiry] = useState(false);
-  const [selectedCertDuration, setSelectedCertDuration] = useState(null);
+  const [manualRetraining, setManualRetraining] = useState(false);
+  const [selectedTrainingDuration, setSelectedTrainingDuration] = useState(null);
 
+  // Method icons mapping
+  const methodIcons = {
+    'online': <FaLaptop className="mr-1" />,
+    'in-person': <FaUserFriends className="mr-1" />,
+    'hybrid': <FaBlenderPhone className="mr-1" />
+  };
 
   useEffect(() => {
     const fetchCsrfToken = async () => {
@@ -57,19 +69,18 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
     fetchCsrfToken();
   }, []);
 
-
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch available certifications with duration information
-        const certsResponse = await axios.get(`${BASE_URL}/api/certifications/dropdown`);
-        if (certsResponse.data.success) {
-          setAvailableCertifications(certsResponse.data.data);
+        // Fetch available trainings with duration information
+        const trainingsResponse = await axios.get(`${BASE_URL}/api/trainings/dropdown`);
+        if (trainingsResponse.data.success) {
+          setAvailableTrainings(trainingsResponse.data.data);
         } else {
-          throw new Error(certsResponse.data.message || "Failed to load certifications");
+          throw new Error(trainingsResponse.data.message || "Failed to load trainings");
         }
 
         // Fetch company details
@@ -80,12 +91,12 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
           throw new Error("Failed to load company details");
         }
 
-        if (isEdit && certificationId) {
-          const certResponse = await axios.get(
-            `${BASE_URL}/api/company-certifications/${certificationId}`
+        if (isEdit && trainingId) {
+          const trainingResponse = await axios.get(
+            `${BASE_URL}/api/company-trainings/${trainingId}`
           );
-          if (certResponse.data.success) {
-            const certData = certResponse.data.data;
+          if (trainingResponse.data.success) {
+            const trainingData = trainingResponse.data.data;
 
             // Format dates for form inputs
             const formatDateForInput = (dateString) => {
@@ -95,23 +106,26 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             };
 
             setFormData({
-              company: certData.company._id,
-              certification: certData.certification._id,
-              certificationId: certData.certificationId,
-              issueDate: formatDateForInput(certData.issueDate),
-              expiryDate: formatDateForInput(certData.expiryDate),
-              firstSurveillanceDate: formatDateForInput(certData.firstSurveillanceDate),
-              secondSurveillanceDate: formatDateForInput(certData.secondSurveillanceDate),
-              status: certData.status,
-              notes: certData.notes || "",
+              company: trainingData.company._id,
+              training: trainingData.training._id,
+              trainingId: trainingData.trainingId,
+              trainingDate: formatDateForInput(trainingData.trainingDate),
+              nextRetrainingDate: formatDateForInput(trainingData.nextRetrainingDate),
+              employeeCount: trainingData.employeeCount,
+              status: trainingData.status,
+              notes: trainingData.notes || "",
+              trainingMethod: trainingData.trainingMethod || "online",
+              trainer: trainingData.trainer || "",
+              certificateIssued: trainingData.certificateIssued || false,
+              certificateIssueDate: formatDateForInput(trainingData.certificateIssueDate),
             });
 
-            // In edit mode, we consider expiry date as manually set
-            if (certData.expiryDate) {
-              setManualExpiry(true);
+            // In edit mode, we consider retraining date as manually set if it exists
+            if (trainingData.nextRetrainingDate) {
+              setManualRetraining(true);
             }
           } else {
-            throw new Error("Failed to load certification details");
+            throw new Error("Failed to load training details");
           }
         }
       } catch (error) {
@@ -128,34 +142,34 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
     };
 
     fetchInitialData();
-  }, [companyId, certificationId, isEdit]);
+  }, [companyId, trainingId, isEdit]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
+    
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
 
-    // When certification changes, get its duration
-    if (name === "certification" && value) {
-      const selectedCert = availableCertifications.find(c => c._id === value);
-      setSelectedCertDuration(selectedCert?.durationInMonths || null);
+    // When training changes, get its duration
+    if (name === "training" && value) {
+      const selectedTraining = availableTrainings.find(t => t._id === value);
+      setSelectedTrainingDuration(selectedTraining?.durationInHours || null);
     }
   };
 
-  const handleIssueDateChange = (e) => {
-    const issueDate = e.target.value;
-    setFormData(prev => ({ ...prev, issueDate }));
+  const handleTrainingDateChange = (e) => {
+    const trainingDate = e.target.value;
+    setFormData(prev => ({ ...prev, trainingDate }));
 
-    // Auto-calculate expiry if not manually set and we have duration
-    if (!manualExpiry && selectedCertDuration && issueDate) {
-      const calculatedExpiry = new Date(issueDate);
-      calculatedExpiry.setMonth(calculatedExpiry.getMonth() + selectedCertDuration);
-      calculatedExpiry.setDate(calculatedExpiry.getDate() - 1); // Subtract 1 day
+    // Auto-calculate next retraining if not manually set
+    if (!manualRetraining && trainingDate) {
+      const calculatedRetraining = new Date(trainingDate);
+      calculatedRetraining.setFullYear(calculatedRetraining.getFullYear() + 1); // Default to 1 year later
       setFormData(prev => ({
         ...prev,
-        expiryDate: calculatedExpiry.toISOString().split("T")[0]
+        nextRetrainingDate: calculatedRetraining.toISOString().split("T")[0]
       }));
     }
   };
@@ -164,7 +178,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
     e.preventDefault();
 
     // Basic validation
-    if (!formData.certification || !formData.issueDate) {
+    if (!formData.training || !formData.trainingDate) {
       toast.error("Please fill out all required fields");
       return;
     }
@@ -173,18 +187,20 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
       setSubmitting(true);
 
       const endpoint = isEdit
-        ? `${BASE_URL}/api/company-certifications/${certificationId}`
-        : `${BASE_URL}/api/company-certifications`;
+        ? `${BASE_URL}/api/company-trainings/${trainingId}`
+        : `${BASE_URL}/api/company-trainings`;
 
       const method = isEdit ? "put" : "post";
 
-      // Prepare payload - remove expiryDate if not manually set (let backend calculate)
+      // Prepare payload
       const payload = {
         ...formData,
-        // For new certifications, if certificationId is empty, let the backend generate it
-        certificationId: isEdit ? formData.certificationId : (formData.certificationId || undefined),
-        // Clear expiry date if not manually set (backend will calculate)
-        expiryDate: manualExpiry ? formData.expiryDate : undefined
+        // For new trainings, if trainingId is empty, let the backend generate it
+        trainingId: isEdit ? formData.trainingId : (formData.trainingId || undefined),
+        // Clear nextRetrainingDate if not manually set (backend will calculate)
+        nextRetrainingDate: manualRetraining ? formData.nextRetrainingDate : undefined,
+        // Ensure employeeCount is a number
+        employeeCount: parseInt(formData.employeeCount, 10)
       };
 
       const response = await axios[method](endpoint, payload, {
@@ -197,22 +213,26 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
 
       if (response.data.success) {
         toast.success(
-          `Certification ${isEdit ? "updated" : "added"} successfully`
+          `Training ${isEdit ? "updated" : "added"} successfully`
         );
         navigate(`/admin/companies/view/${companyId}`);
       } else {
         throw new Error(
           response.data.message ||
-            `Failed to ${isEdit ? "update" : "add"} certification`
+            `Failed to ${isEdit ? "update" : "add"} training`
         );
       }
     } catch (error) {
       console.error("Submit error:", error);
-      toast.error(
-        error.response?.data?.message ||
+      if (error.response?.status === 403 && error.response?.data?.code === 'EBADCSRFTOKEN') {
+        toast.error("Session expired. Please refresh the page and try again.");
+      } else {
+        toast.error(
+          error.response?.data?.message ||
           error.message ||
-          `Failed to ${isEdit ? "update" : "add"} certification`
-      );
+          `Failed to ${isEdit ? "update" : "add"} training`
+        );
+      }
     } finally {
       setSubmitting(false);
     }
@@ -251,12 +271,12 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
       <div className="flex justify-between items-center mb-6 pb-4 border-b">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
-            {isEdit ? "Edit Certification" : "Add New Certification"}
+            {isEdit ? "Edit Training Record" : "Add New Training"}
           </h1>
           <p className="text-gray-600 mt-1">
             {isEdit
-              ? "Update certification details for"
-              : "Add a new certification to"}{" "}
+              ? "Update training details for"
+              : "Add a new training record to"}{" "}
             {companyDetails?.name}
           </p>
         </div>
@@ -271,17 +291,17 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Certification ID */}
+        {/* Training ID */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             <FaIdCard className="inline mr-1" />
-            Certification ID
+            Training ID
             {isEdit && <span className="text-red-500">*</span>}
           </label>
           <input
             type="text"
-            name="certificationId"
-            value={formData.certificationId}
+            name="trainingId"
+            value={formData.trainingId}
             onChange={handleChange}
             required={isEdit}
             placeholder={isEdit ? "" : "Leave blank to auto-generate"}
@@ -289,32 +309,58 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
           />
           {!isEdit && (
             <p className="text-xs text-gray-500 mt-1">
-              If left blank, a unique ID will be automatically generated (format: FCRT-XXXXXX)
+              If left blank, a unique ID will be automatically generated (format: FTRN-XXXXXX)
             </p>
           )}
         </div>
 
-        {/* Certification Selection */}
+        {/* Training Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            <FaCertificate className="inline mr-1" />
-            Certification Type <span className="text-red-500">*</span>
+            <FaChalkboardTeacher className="inline mr-1" />
+            Training Program <span className="text-red-500">*</span>
           </label>
           <select
-            name="certification"
-            value={formData.certification}
+            name="training"
+            value={formData.training}
             onChange={handleChange}
             required
             disabled={isEdit}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
           >
-            <option value="">Select a Certification</option>
-            {availableCertifications.map((cert) => (
-              <option key={cert._id} value={cert._id}>
-                {cert.name} {cert.durationInMonths ? `(${cert.durationInMonths} months)` : ''}
+            <option value="">Select a Training Program</option>
+            {availableTrainings.map((training) => (
+              <option key={training._id} value={training._id}>
+                {training.name} {training.durationInHours ? `(${training.durationInHours} hours)` : ''}
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Training Method */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            <FaChalkboardTeacher className="inline mr-1" />
+            Training Method <span className="text-red-500">*</span>
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {['online', 'in-person', 'hybrid'].map(method => (
+              <label key={method} className="flex items-center space-x-2 p-3 border rounded-md hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="trainingMethod"
+                  value={method}
+                  checked={formData.trainingMethod === method}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                />
+                <span className="flex items-center">
+                  {methodIcons[method]}
+                  <span className="ml-1 capitalize">{method}</span>
+                </span>
+              </label>
+            ))}
+          </div>
         </div>
 
         {/* Dates - Two Column Layout */}
@@ -322,13 +368,13 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               <FaCalendarAlt className="inline mr-1" />
-              Issue Date <span className="text-red-500">*</span>
+              Training Date <span className="text-red-500">*</span>
             </label>
             <input
               type="date"
-              name="issueDate"
-              value={formData.issueDate}
-              onChange={handleIssueDateChange}
+              name="trainingDate"
+              value={formData.trainingDate}
+              onChange={handleTrainingDateChange}
               required
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
@@ -338,79 +384,106 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             <div className="flex items-center mb-1">
               <label className="block text-sm font-medium text-gray-700">
                 <FaCalendarAlt className="inline mr-1" />
-                Expiry Date
+                Next Retraining Date
               </label>
               <div className="flex items-center ml-3">
                 <input
                   type="checkbox"
-                  id="manualExpiry"
-                  checked={manualExpiry}
-                  onChange={() => setManualExpiry(!manualExpiry)}
+                  id="manualRetraining"
+                  checked={manualRetraining}
+                  onChange={() => setManualRetraining(!manualRetraining)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="manualExpiry" className="ml-2 block text-xs text-gray-700">
+                <label htmlFor="manualRetraining" className="ml-2 block text-xs text-gray-700">
                   Set manually
                 </label>
               </div>
             </div>
             <input
               type="date"
-              name="expiryDate"
-              value={formData.expiryDate}
+              name="nextRetrainingDate"
+              value={formData.nextRetrainingDate}
               onChange={handleChange}
-              disabled={!manualExpiry}
+              disabled={!manualRetraining}
               className={`w-full p-2 border rounded-md ${
-                manualExpiry
+                manualRetraining
                   ? "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                   : "border-gray-200 bg-gray-100 text-gray-500"
               }`}
             />
-            {!manualExpiry && (
-              <p className="text-xs text-gray-500 mt-1 flex items-center">
-                <FaCalculator className="mr-1" />
-                {selectedCertDuration
-                  ? `Expiry will be automatically calculated (${selectedCertDuration} months from issue date)`
-                  : "Select a certification with duration to auto-calculate expiry"}
+            {!manualRetraining && (
+              <p className="text-xs text-gray-500 mt-1">
+                Next retraining will be automatically calculated (1 year from training date)
               </p>
             )}
           </div>
         </div>
 
-        {/* Surveillance Dates - Two Column Layout */}
+        {/* Employee Count and Trainer */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              <FaCalendarAlt className="inline mr-1" />
-              First Surveillance Date
+              <FaUsers className="inline mr-1" />
+              Number of Employees Trained <span className="text-red-500">*</span>
             </label>
             <input
-              type="date"
-              name="firstSurveillanceDate"
-              value={formData.firstSurveillanceDate}
+              type="number"
+              name="employeeCount"
+              value={formData.employeeCount}
               onChange={handleChange}
+              min="1"
+              required
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Optional surveillance audit date
-            </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              <FaCalendarAlt className="inline mr-1" />
-              Second Surveillance Date
+              <FaChalkboardTeacher className="inline mr-1" />
+              Trainer Name
             </label>
             <input
-              type="date"
-              name="secondSurveillanceDate"
-              value={formData.secondSurveillanceDate}
+              type="text"
+              name="trainer"
+              value={formData.trainer}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Optional: Name of trainer/instructor"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Optional surveillance audit date
-            </p>
           </div>
+        </div>
+
+        {/* Certificate Information */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="certificateIssued"
+              name="certificateIssued"
+              checked={formData.certificateIssued}
+              onChange={handleChange}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor="certificateIssued" className="ml-2 block text-sm text-gray-700">
+              Certificate Issued?
+            </label>
+          </div>
+
+          {formData.certificateIssued && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <FaCalendarAlt className="inline mr-1" />
+                Certificate Issue Date
+              </label>
+              <input
+                type="date"
+                name="certificateIssueDate"
+                value={formData.certificateIssueDate}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          )}
         </div>
 
         {/* Status */}
@@ -426,10 +499,10 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             required
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="active">Active</option>
-            <option value="suspended">Suspended</option>
-            <option value="expired">Expired</option>
-            <option value="recertification">Recertification</option>
+            <option value="Requested">Requested</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Time to Retrain">Time to Retrain</option>
           </select>
         </div>
 
@@ -445,7 +518,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             onChange={handleChange}
             rows="3"
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Add any additional notes or comments about this certification"
+            placeholder="Add any additional notes or comments about this training"
           ></textarea>
         </div>
 
@@ -471,7 +544,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
             ) : (
               <>
                 <FaSave className="mr-2" />
-                {isEdit ? "Update Certification" : "Save Certification"}
+                {isEdit ? "Update Training" : "Save Training"}
               </>
             )}
           </button>
@@ -481,4 +554,4 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
   );
 };
 
-export default CertificationToCompanyForm;
+export default TrainingToCompanyForm;

@@ -10,7 +10,7 @@ import {
 } from 'react-icons/fa';
 import { BASE_URL } from "../../../secrets";
 import CompanyCertifications from './CompanyCertification/CompanyCertifications';
-import CompanyTrainings from './CompanyTrainings';
+import CompanyTrainings from './CompanyTraining/CompanyTrainings';
 
 const CompanyView = () => {
   const { id } = useParams();
