@@ -1,7 +1,14 @@
 import { Outlet, Link } from "react-router-dom";
-import { FaHome, FaBuilding, FaCertificate, FaChalkboardTeacher, FaSignOutAlt, FaClipboardList } from "react-icons/fa";
+import { FaHome, FaBuilding, FaCertificate, FaChalkboardTeacher, FaSignOutAlt, FaClipboardList, FaFileAlt } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
-const AdminLayout = () => {
+const AdminLayout = ({children}) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -15,27 +22,32 @@ const AdminLayout = () => {
               </Link>
             </li>
             <li>
-              <Link to="/admin/companies" className="flex items-center p-2 rounded hover:bg-blue-700">
+              <Link to="/companies" className="flex items-center p-2 rounded hover:bg-blue-700">
                 <FaBuilding className="mr-2" /> Companies
               </Link>
             </li>
             <li>
-              <Link to="/admin/certifications" className="flex items-center p-2 rounded hover:bg-blue-700">
+              <Link to="/certifications" className="flex items-center p-2 rounded hover:bg-blue-700">
                 <FaCertificate className="mr-2" /> Certifications
               </Link>
             </li>
             <li>
-              <Link to="/admin/trainings" className="flex items-center p-2 rounded hover:bg-blue-700">
+              <Link to="/trainings" className="flex items-center p-2 rounded hover:bg-blue-700">
                 <FaChalkboardTeacher className="mr-2" /> Trainings
               </Link>
             </li>
             <li>
-              <Link to="/admin/fields" className="flex items-center p-2 rounded hover:bg-blue-700">
+              <Link to="/fields" className="flex items-center p-2 rounded hover:bg-blue-700">
                 <FaClipboardList className="mr-2" /> Fields
               </Link>
             </li>
+            <li>
+              <Link to="/pages" className="flex items-center p-2 rounded hover:bg-blue-700">
+                <FaFileAlt className="mr-2" /> Pages
+              </Link>
+            </li>
             <li className="absolute bottom-4">
-              <button className="flex items-center p-2 rounded hover:bg-blue-700">
+              <button onClick={handleLogout} className="flex items-center p-2 rounded hover:bg-blue-700">
                 <FaSignOutAlt className="mr-2" /> Logout
               </button>
             </li>
@@ -45,6 +57,7 @@ const AdminLayout = () => {
       
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
+        <main>{children}</main>
         <div className="p-6">
           <Outlet />
         </div>

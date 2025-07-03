@@ -167,7 +167,7 @@ const CertificationList = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <h1 className="text-2xl font-bold text-gray-900">Certification Management</h1>
           <Link
-            to="/admin/certifications/add"
+            to="/certifications/add"
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <FaPlus className="mr-2" /> Add Certification
@@ -292,14 +292,14 @@ const CertificationList = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
                           <Link
-                            to={`/admin/certifications/view/${cert._id}`}
+                            to={`/certifications/view/${cert._id}`}
                             className="text-blue-600 hover:text-blue-900"
                             title="View"
                           >
                             <FaEye className="h-5 w-5" />
                           </Link>
                           <Link
-                            to={`/admin/certifications/edit/${cert._id}`}
+                            to={`/certifications/edit/${cert._id}`}
                             className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                             title="Edit"
                           >

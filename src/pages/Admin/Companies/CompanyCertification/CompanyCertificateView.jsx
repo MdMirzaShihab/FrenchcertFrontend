@@ -88,7 +88,7 @@ const CompanyCertificateView = () => {
           <h2 className="text-xl font-bold text-red-800 mb-2">Error Loading Certificate</h2>
           <p className="text-red-600 mb-4">{error}</p>
           <Link
-            to={`/admin/companies/view/${certificate?.company?._id || ''}`}
+            to={`/companies/view/${certificate?.company?._id || ''}`}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             Return to Company
@@ -118,7 +118,7 @@ const CompanyCertificateView = () => {
         
         <div className="flex space-x-3">
           <Link
-            to={`/admin/companies/${certificate.company?._id}/edit-certification/${certificate._id}`}
+            to={`/companies/${certificate.company?._id}/edit-certification/${certificate._id}`}
             className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors flex items-center"
           >
             <FaEdit className="mr-2" />
@@ -132,7 +132,7 @@ const CompanyCertificateView = () => {
             Print
           </button>
           <Link
-            to={`/admin/companies/view/${certificate.company?._id}`}
+            to={`/companies/view/${certificate.company?._id}`}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center"
           >
             <FaArrowLeft className="mr-2" />

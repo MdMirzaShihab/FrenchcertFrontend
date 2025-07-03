@@ -46,7 +46,7 @@ const FieldView = () => {
     try {
       await axios.delete(`${BASE_URL}/api/fields/${id}`);
       toast.success("Field deleted successfully");
-      navigate("/admin/fields");
+      navigate("/fields");
     } catch (err) {
       let errorMsg = err.response?.data?.message || "Failed to delete field";
       
@@ -85,7 +85,7 @@ const FieldView = () => {
           {items.map(item => (
             <li key={item._id}>
               <Link 
-                to={`/admin/${type}/view/${item._id}`} 
+                to={`/${type}/view/${item._id}`} 
                 className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
               >
                 {item.name}
@@ -136,7 +136,7 @@ const FieldView = () => {
             </div>
             <div className="flex space-x-3">
               <button
-                onClick={() => navigate("/admin/fields")}
+                onClick={() => navigate("/fields")}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Back to Fields List
@@ -172,7 +172,7 @@ const FieldView = () => {
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
-              to={`/admin/fields/edit/${field._id}`}
+              to={`/fields/edit/${field._id}`}
               className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <FaEdit className="mr-2" /> Edit
@@ -184,7 +184,7 @@ const FieldView = () => {
               <FaTrash className="mr-2" /> Delete
             </button>
             <Link
-              to="/admin/fields"
+              to="/fields"
               className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <FaList className="mr-2" /> All Fields

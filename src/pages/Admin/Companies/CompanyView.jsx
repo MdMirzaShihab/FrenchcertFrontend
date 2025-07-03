@@ -39,7 +39,7 @@ const CompanyView = () => {
         toast.error(error.response?.data?.message || 'Failed to load company data');
         
         if (error.response?.status === 404) {
-          navigate('/admin/companies', { replace: true });
+          navigate('/companies', { replace: true });
         }
       } finally {
         setLoading(false);
@@ -59,7 +59,7 @@ const CompanyView = () => {
       
       if (response.data.success) {
         toast.success('Company deleted successfully');
-        navigate('/admin/companies');
+        navigate('/companies');
       } else {
         throw new Error(response.data.message || 'Failed to delete company');
       }
@@ -91,7 +91,7 @@ const CompanyView = () => {
             Try Again
           </button>
           <Link
-            to="/admin/companies"
+            to="/companies"
             className="ml-4 px-4 py-2 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 transition-colors"
           >
             Back to Companies
@@ -107,7 +107,7 @@ const CompanyView = () => {
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Company Not Found</h2>
           <Link 
-            to="/admin/companies" 
+            to="/companies" 
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             Return to Companies List
@@ -139,7 +139,7 @@ const CompanyView = () => {
         
         <div className="flex space-x-2">
           <Link
-            to="/admin/companies"
+            to="/companies"
             className="px-3 py-2 bg-gray-100 text-gray-700 rounded-md flex items-center hover:bg-gray-200 transition-colors"
           >
             <FaArrowLeft className="mr-1" />
@@ -147,7 +147,7 @@ const CompanyView = () => {
           </Link>
           
           <Link
-            to={`/admin/companies/edit/${company._id}`}
+            to={`/companies/edit/${company._id}`}
             className="px-3 py-2 bg-blue-600 text-white rounded-md flex items-center hover:bg-blue-700 transition-colors"
           >
             <FaEdit className="mr-1" />

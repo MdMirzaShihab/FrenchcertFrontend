@@ -214,7 +214,7 @@ const CompanyTrainings = ({ companyId }) => {
           </button>
 
           <Link
-            to={`/admin/companies/${companyId}/add-training`}
+            to={`/companies/${companyId}/add-training`}
             className="px-3 py-2 bg-green-600 text-white text-sm rounded-md flex items-center hover:bg-green-700 transition-colors">
             <FaChalkboardTeacher className="mr-1" />
             Add Training
@@ -327,7 +327,7 @@ const CompanyTrainings = ({ companyId }) => {
             </button>
           ) : null}
           <Link
-            to={`/admin/companies/${companyId}/add-training`}
+            to={`/companies/${companyId}/add-training`}
             className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
             Add First Training
           </Link>
@@ -400,13 +400,13 @@ const CompanyTrainings = ({ companyId }) => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
                       <Link
-                        to={`/admin/companies/training/${training._id}`}
+                        to={`/companies/training/${training._id}`}
                         className="text-blue-600 hover:text-blue-900"
                         title="View Training Details">
                         <FaEye />
                       </Link>
                       <Link
-                        to={`/admin/companies/${companyId}/edit-training/${training._id}`}
+                        to={`/companies/${companyId}/edit-training/${training._id}`}
                         className="text-green-600 hover:text-green-900"
                         title="Edit Training">
                         <FaEdit />

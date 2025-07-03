@@ -29,45 +29,16 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
     trainingDate: "",
     nextRetrainingDate: "",
     employeeCount: 1,
-    status: "Completed",
+    completed: "Completed",
     notes: "",
-    trainingMethod: "online",
-    trainer: "",
-    certificateIssued: false,
-    certificateIssueDate: "",
   });
 
-  const [csrfToken, setCsrfToken] = useState('');
   const [availableTrainings, setAvailableTrainings] = useState([]);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [manualRetraining, setManualRetraining] = useState(false);
-  const [selectedTrainingDuration, setSelectedTrainingDuration] = useState(null);
-
-  // Method icons mapping
-  const methodIcons = {
-    'online': <FaLaptop className="mr-1" />,
-    'in-person': <FaUserFriends className="mr-1" />,
-    'hybrid': <FaBlenderPhone className="mr-1" />
-  };
-
-  useEffect(() => {
-    const fetchCsrfToken = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/api/auth/csrf-token`, {
-          withCredentials: true // Important for cookies
-        });
-        setCsrfToken(response.data.csrfToken);
-      } catch (error) {
-        console.error("Error fetching CSRF token:", error);
-        toast.error("Failed to load security token. Please refresh the page.");
-      }
-    };
-    
-    fetchCsrfToken();
-  }, []);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -75,7 +46,7 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
         setLoading(true);
         setError(null);
 
-        // Fetch available trainings with duration information
+        // Fetch available trainings
         const trainingsResponse = await axios.get(`${BASE_URL}/api/trainings/dropdown`);
         if (trainingsResponse.data.success) {
           setAvailableTrainings(trainingsResponse.data.data);
@@ -112,12 +83,8 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
               trainingDate: formatDateForInput(trainingData.trainingDate),
               nextRetrainingDate: formatDateForInput(trainingData.nextRetrainingDate),
               employeeCount: trainingData.employeeCount,
-              status: trainingData.status,
+              completed: trainingData.completed,
               notes: trainingData.notes || "",
-              trainingMethod: trainingData.trainingMethod || "online",
-              trainer: trainingData.trainer || "",
-              certificateIssued: trainingData.certificateIssued || false,
-              certificateIssueDate: formatDateForInput(trainingData.certificateIssueDate),
             });
 
             // In edit mode, we consider retraining date as manually set if it exists
@@ -145,18 +112,12 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
   }, [companyId, trainingId, isEdit]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
     
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'number' ? parseInt(value, 10) : value,
     }));
-
-    // When training changes, get its duration
-    if (name === "training" && value) {
-      const selectedTraining = availableTrainings.find(t => t._id === value);
-      setSelectedTrainingDuration(selectedTraining?.durationInHours || null);
-    }
   };
 
   const handleTrainingDateChange = (e) => {
@@ -203,19 +164,13 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
         employeeCount: parseInt(formData.employeeCount, 10)
       };
 
-      const response = await axios[method](endpoint, payload, {
-        headers: {
-          'CSRF-Token': csrfToken,
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true
-      });
+      const response = await axios[method](endpoint, payload);
 
       if (response.data.success) {
         toast.success(
           `Training ${isEdit ? "updated" : "added"} successfully`
         );
-        navigate(`/admin/companies/view/${companyId}`);
+        navigate(`/companies/view/${companyId}`);
       } else {
         throw new Error(
           response.data.message ||
@@ -224,15 +179,11 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
       }
     } catch (error) {
       console.error("Submit error:", error);
-      if (error.response?.status === 403 && error.response?.data?.code === 'EBADCSRFTOKEN') {
-        toast.error("Session expired. Please refresh the page and try again.");
-      } else {
-        toast.error(
-          error.response?.data?.message ||
+      toast.error(
+        error.response?.data?.message ||
           error.message ||
           `Failed to ${isEdit ? "update" : "add"} training`
-        );
-      }
+      );
     } finally {
       setSubmitting(false);
     }
@@ -256,7 +207,7 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
           </h2>
           <p className="text-red-600 mb-4">{error}</p>
           <Link
-            to={`/admin/companies/view/${companyId}`}
+            to={`/companies/view/${companyId}`}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
             Return to Company
           </Link>
@@ -282,7 +233,7 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
         </div>
 
         <Link
-          to={`/admin/companies/view/${companyId}`}
+          to={`/companies/view/${companyId}`}
           className="px-3 py-2 bg-gray-100 text-gray-700 rounded-md flex items-center hover:bg-gray-200 transition-colors">
           <FaArrowLeft className="mr-1" />
           Back to Company
@@ -331,36 +282,10 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
             <option value="">Select a Training Program</option>
             {availableTrainings.map((training) => (
               <option key={training._id} value={training._id}>
-                {training.name} {training.durationInHours ? `(${training.durationInHours} hours)` : ''}
+                {training.name}
               </option>
             ))}
           </select>
-        </div>
-
-        {/* Training Method */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            <FaChalkboardTeacher className="inline mr-1" />
-            Training Method <span className="text-red-500">*</span>
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {['online', 'in-person', 'hybrid'].map(method => (
-              <label key={method} className="flex items-center space-x-2 p-3 border rounded-md hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="trainingMethod"
-                  value={method}
-                  checked={formData.trainingMethod === method}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                />
-                <span className="flex items-center">
-                  {methodIcons[method]}
-                  <span className="ml-1 capitalize">{method}</span>
-                </span>
-              </label>
-            ))}
-          </div>
         </div>
 
         {/* Dates - Two Column Layout */}
@@ -419,71 +344,21 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
           </div>
         </div>
 
-        {/* Employee Count and Trainer */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              <FaUsers className="inline mr-1" />
-              Number of Employees Trained <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              name="employeeCount"
-              value={formData.employeeCount}
-              onChange={handleChange}
-              min="1"
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              <FaChalkboardTeacher className="inline mr-1" />
-              Trainer Name
-            </label>
-            <input
-              type="text"
-              name="trainer"
-              value={formData.trainer}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Optional: Name of trainer/instructor"
-            />
-          </div>
-        </div>
-
-        {/* Certificate Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="certificateIssued"
-              name="certificateIssued"
-              checked={formData.certificateIssued}
-              onChange={handleChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="certificateIssued" className="ml-2 block text-sm text-gray-700">
-              Certificate Issued?
-            </label>
-          </div>
-
-          {formData.certificateIssued && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                <FaCalendarAlt className="inline mr-1" />
-                Certificate Issue Date
-              </label>
-              <input
-                type="date"
-                name="certificateIssueDate"
-                value={formData.certificateIssueDate}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          )}
+        {/* Employee Count */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            <FaUsers className="inline mr-1" />
+            Number of Employees Trained <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            name="employeeCount"
+            value={formData.employeeCount}
+            onChange={handleChange}
+            min="1"
+            required
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
         </div>
 
         {/* Status */}
@@ -493,8 +368,8 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
             Status <span className="text-red-500">*</span>
           </label>
           <select
-            name="status"
-            value={formData.status}
+            name="completed"
+            value={formData.completed}
             onChange={handleChange}
             required
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -525,7 +400,7 @@ const TrainingToCompanyForm = ({ isEdit = false }) => {
         {/* Form Actions */}
         <div className="flex justify-end space-x-3 pt-4 border-t">
           <Link
-            to={`/admin/companies/view/${companyId}`}
+            to={`/companies/view/${companyId}`}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
           >
             Cancel

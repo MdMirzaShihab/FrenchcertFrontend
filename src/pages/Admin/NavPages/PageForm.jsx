@@ -212,24 +212,24 @@ const MenuBar = ({ editor }) => {
   );
 };
 
-const CertificationForm = ({ isEdit = false }) => {
+const PageForm = ({ isEdit = false }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [availableFields, setAvailableFields] = useState([]);
 
   const [formData, setFormData] = useState({
-    name: "",
-    shortDescription: "",
-    description: "",
-    certificationType: "",
-    callToAction: "",
-    fields: [],
-    durationInMonths: 12,
+    title: "",
+    slug: "",
+    content: "",
+    metaTitle: "",
+    metaDescription: "",
+    isPublished: true,
+    showInNavbar: true,
+    navbarOrder: 0
   });
 
-  // Initialize Tiptap editor with all extensions
+  // Initialize Tiptap editor
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -249,9 +249,9 @@ const CertificationForm = ({ isEdit = false }) => {
         alignments: ["left", "center", "right", "justify"],
       }),
     ],
-    content: formData.description,
+    content: formData.content,
     onUpdate: ({ editor }) => {
-      setFormData((prev) => ({ ...prev, description: editor.getHTML() }));
+      setFormData((prev) => ({ ...prev, content: editor.getHTML() }));
     },
     editorProps: {
       attributes: {
@@ -262,114 +262,83 @@ const CertificationForm = ({ isEdit = false }) => {
 
   // Sync editor content with form data
   useEffect(() => {
-    if (editor && formData.description !== editor.getHTML()) {
-      editor.commands.setContent(formData.description);
+    if (editor && formData.content !== editor.getHTML()) {
+      editor.commands.setContent(formData.content);
     }
-  }, [formData.description, editor]);
+  }, [formData.content, editor]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    if (!isEdit) return;
+
+    const fetchPage = async () => {
       try {
         setLoading(true);
-        const fieldsRes = await axios.get(`${BASE_URL}/api/fields`);
-        if (fieldsRes.data.success) setAvailableFields(fieldsRes.data.data?.fields );
-
-        if (isEdit) {
-          const certRes = await axios.get(
-            `${BASE_URL}/api/certifications/${id}`
-          );
-          if (certRes.data.success) {
-            const cert = certRes.data.data;
-            setFormData({
-              name: cert.name,
-              shortDescription: cert.shortDescription,
-              description: cert.description,
-              certificationType: cert.certificationType,
-              callToAction: cert.callToAction,
-              fields: cert.fields.map((f) => f._id),
-              durationInMonths: cert.durationInMonths || 12,
-            });
-          }
+        const response = await axios.get(`${BASE_URL}/api/pages/id/${id}`);
+        if (response.data.success) {
+          const page = response.data.data;
+          setFormData({
+            title: page.title,
+            slug: page.slug,
+            content: page.content,
+            metaTitle: page.metaTitle || "",
+            metaDescription: page.metaDescription || "",
+            isPublished: page.isPublished,
+            showInNavbar: page.showInNavbar,
+            navbarOrder: page.navbarOrder
+          });
         }
       } catch (error) {
-        setError(error.response?.data?.message || "Failed to fetch data");
-        toast.error(error.response?.data?.message || "Failed to fetch data");
+        setError(error.response?.data?.message || "Failed to fetch page");
+        toast.error(error.response?.data?.message || "Failed to fetch page");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchPage();
   }, [isEdit, id]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const countWords = (text) => {
-    if (!text.trim()) return 0;
-    return text.trim().split(/\s+/).length;
-  };
-
-  const handleFieldToggle = (fieldId) => {
-    setFormData((prev) => ({
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
       ...prev,
-      fields: prev.fields.includes(fieldId)
-        ? prev.fields.filter((id) => id !== fieldId)
-        : [...prev.fields, fieldId],
+      [name]: type === 'checkbox' ? checked : value
     }));
-  };const handleSubmit = async (e) => {
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  
+    
     // Validate required fields
-    const requiredFields = [
-      "name",
-      "shortDescription",
-      "description",
-      "certificationType",
-      "callToAction",
-    ];
-    for (const field of requiredFields) {
-      if (!formData[field]) {
-        setError(`${field} is required`);
-        toast.error(`${field} is required`);
-        return;
-      }
-    }
-  
-    if (!formData.fields || formData.fields.length === 0) {
-      setError("At least one field is required");
-      toast.error("At least one field is required");
+    if (!formData.title || !formData.slug || !formData.content) {
+      setError("Title, slug, and content are required");
+      toast.error("Title, slug, and content are required");
       return;
     }
-  
+
     setLoading(true);
     setError(null);
-  
+
     try {
-      const url = isEdit
-        ? `${BASE_URL}/api/certifications/${id}`
-        : `${BASE_URL}/api/certifications`;
+      const url = isEdit 
+        ? `${BASE_URL}/api/pages/${id}`
+        : `${BASE_URL}/api/pages`;
       const method = isEdit ? "put" : "post";
-  
-      const response = await axios[method](url, {
-        ...formData,
-        description: editor?.getHTML() || formData.description,
-      });
-  
+
+      const response = await axios[method](url, formData);
+
       if (response.data.success) {
         toast.success(
-          isEdit
-            ? "Certification updated successfully"
-            : "Certification created successfully"
+          isEdit ? "Page updated successfully" : "Page created successfully"
         );
-        navigate("/certifications");
+        navigate("/pages");
       }
     } catch (error) {
       const errorMessage =
-        error.response?.data?.errors?.join(", ") || error.response?.data?.message || "An error occurred";
-  
+        error.response?.data?.errors?.join(", ") || 
+        error.response?.data?.message || 
+        "An error occurred";
+      
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -378,13 +347,17 @@ const CertificationForm = ({ isEdit = false }) => {
   };
 
   if (loading && isEdit) {
-    return <div className="p-6">Loading certification data...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">
-        {isEdit ? "Edit Certification" : "Add New Certification"}
+        {isEdit ? "Edit Page" : "Create New Page"}
       </h1>
 
       {error && (
@@ -395,12 +368,12 @@ const CertificationForm = ({ isEdit = false }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">
-              Name <span className="text-red-500">*</span>
+              Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="title"
+              value={formData.title}
               onChange={handleChange}
               className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
               required
@@ -408,40 +381,30 @@ const CertificationForm = ({ isEdit = false }) => {
             />
           </div>
 
-          <div className="md:col-span-2">
+          <div>
             <label className="block text-gray-700 mb-2">
-              Short Description <span className="text-red-500">*</span>
-              <span className="text-sm font-normal text-gray-500 ml-2">
-                ({countWords(formData.shortDescription)} words)
-              </span>
+              Slug <span className="text-red-500">*</span>
             </label>
-
-            <textarea
-              name="shortDescription"
-              value={formData.shortDescription}
-              onChange={handleChange}
-              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-              required
-              disabled={loading}
-              rows={3}
-            />
-
-            {countWords(formData.shortDescription) < 10 && (
-              <p className="text-sm text-yellow-600 mt-1">
-                Minimum 10 words recommended
-              </p>
-            )}
-            {countWords(formData.shortDescription) > 35 && (
-              <p className="text-sm text-yellow-600 mt-1">
-                Maximum 35 words recommended
-              </p>
-            )}
+            <div className="flex">
+              <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                /
+              </span>
+              <input
+                type="text"
+                name="slug"
+                value={formData.slug}
+                onChange={handleChange}
+                className="flex-1 p-2 border rounded-r focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                required
+                disabled={loading}
+                placeholder="about-us"
+              />
+            </div>
           </div>
-
 
           <div className="md:col-span-2">
             <label className="block text-gray-700 mb-2">
-              Description <span className="text-red-500">*</span>
+              Content <span className="text-red-500">*</span>
             </label>
             <div className="border rounded-lg overflow-hidden">
               <MenuBar editor={editor} />
@@ -453,81 +416,88 @@ const CertificationForm = ({ isEdit = false }) => {
             </div>
           </div>
 
-          <div className="md:col-span-2">
-            <label className="block text-gray-700 mb-2">
-              Certification Type <span className="text-red-500">*</span>
-            </label>
+          <div>
+            <label className="block text-gray-700 mb-2">Meta Title</label>
             <input
               type="text"
-              name="certificationType"
-              value={formData.certificationType}
+              name="metaTitle"
+              value={formData.metaTitle}
               onChange={handleChange}
               className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-              required
               disabled={loading}
-              placeholder="e.g., ISO 9001, Cybersecurity, etc."
+              maxLength="100"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.metaTitle.length}/100 characters
+            </p>
           </div>
 
           <div>
-            <label className="block text-gray-700 mb-2">
-              Duration (months) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              name="durationInMonths"
-              min="1"
-              value={formData.durationInMonths}
+            <label className="block text-gray-700 mb-2">Meta Description</label>
+            <textarea
+              name="metaDescription"
+              value={formData.metaDescription}
               onChange={handleChange}
               className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-              required
+              disabled={loading}
+              rows={3}
+              maxLength="160"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.metaDescription.length}/160 characters
+            </p>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="isPublished"
+              name="isPublished"
+              checked={formData.isPublished}
+              onChange={handleChange}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               disabled={loading}
             />
+            <label htmlFor="isPublished" className="ml-2 block text-gray-700">
+              Published
+            </label>
           </div>
 
-          <div className="md:col-span-2">
-            <label className="block text-gray-700 mb-2">Fields <span className="text-red-500">*</span></label>
-            {availableFields.length === 0 ? (
-              <div className="text-gray-500">Loading fields...</div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {availableFields.map((field) => (
-                  <label key={field._id} className="flex items-center mb-2">
-                    <input
-                      type="checkbox"
-                      checked={formData.fields.includes(field._id)}
-                      onChange={() => handleFieldToggle(field._id)}
-                      className="mr-2"
-                      disabled={loading}
-                    />
-                    {field.name}
-                  </label>
-                ))}
-              </div>
-            )}
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="showInNavbar"
+              name="showInNavbar"
+              checked={formData.showInNavbar}
+              onChange={handleChange}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              disabled={loading}
+            />
+            <label htmlFor="showInNavbar" className="ml-2 block text-gray-700">
+              Show in Navbar
+            </label>
           </div>
-        </div>
 
-        <div className="md:col-span-2">
-          <label className="block text-gray-700 mb-2 mt-6">
-            Call To Action <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="callToAction"
-            value={formData.callToAction}
-            onChange={handleChange}
-            className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-            required
-            disabled={loading}
-            placeholder="e.g., 'Get Certified Today'"
-          />
+          {formData.showInNavbar && (
+            <div>
+              <label className="block text-gray-700 mb-2">Navbar Order</label>
+              <input
+                type="number"
+                name="navbarOrder"
+                value={formData.navbarOrder}
+                onChange={handleChange}
+                min="0"
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                disabled={loading}
+              />
+            </div>
+          )}
         </div>
 
         <div className="mt-6 flex justify-end space-x-4">
           <button
             type="button"
-            onClick={() => navigate("/certifications")}
+            onClick={() => navigate("/pages")}
             className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100 transition-colors"
             disabled={loading}>
             Cancel
@@ -539,8 +509,8 @@ const CertificationForm = ({ isEdit = false }) => {
             {loading
               ? "Processing..."
               : isEdit
-              ? "Update Certification"
-              : "Save Certification"}
+              ? "Update Page"
+              : "Create Page"}
           </button>
         </div>
       </form>
@@ -548,4 +518,4 @@ const CertificationForm = ({ isEdit = false }) => {
   );
 };
 
-export default CertificationForm;
+export default PageForm;

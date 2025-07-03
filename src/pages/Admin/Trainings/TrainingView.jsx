@@ -57,7 +57,7 @@ const TrainingView = () => {
       try {
         await axios.delete(`${BASE_URL}/api/trainings/${id}`);
         toast.success("Training deleted successfully");
-        navigate("/admin/trainings");
+        navigate("/trainings");
       } catch (error) {
         toast.error(
           error.response?.data?.message || "Failed to delete training"
@@ -101,7 +101,7 @@ const TrainingView = () => {
               "The training you're looking for doesn't exist or has been removed."}
           </p>
           <Link
-            to="/admin/trainings"
+            to="/trainings"
             className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
             <FaChevronLeft className="mr-2" /> Back to Training List
           </Link>
@@ -207,13 +207,13 @@ const TrainingView = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <Link
-          to="/admin/trainings"
+          to="/trainings"
           className="flex items-center text-blue-600 hover:text-blue-800">
           <FaArrowLeft className="mr-2" /> Back to Training List
         </Link>
         <div className="flex gap-4">
           <Link
-            to={`/admin/trainings/edit/${id}`}
+            to={`/trainings/edit/${id}`}
             className="flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg">
             <FaEdit className="mr-2" /> Edit
           </Link>

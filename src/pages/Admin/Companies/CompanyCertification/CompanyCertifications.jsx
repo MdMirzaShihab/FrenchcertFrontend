@@ -196,7 +196,7 @@ const CompanyCertifications = ({ companyId }) => {
           </button>
 
           <Link
-            to={`/admin/companies/${companyId}/add-certification`}
+            to={`/companies/${companyId}/add-certification`}
             className="px-3 py-2 bg-green-600 text-white text-sm rounded-md flex items-center hover:bg-green-700 transition-colors">
             <FaCertificate className="mr-1" />
             Add Certification
@@ -293,7 +293,7 @@ const CompanyCertifications = ({ companyId }) => {
             </button>
           ) : null}
           <Link
-            to={`/admin/companies/${companyId}/add-certification`}
+            to={`/companies/${companyId}/add-certification`}
             className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
             Add First Certification
           </Link>
@@ -357,13 +357,13 @@ const CompanyCertifications = ({ companyId }) => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
                       <Link
-                        to={`/admin/companies/certificate/${cert._id}`}
+                        to={`/companies/certificate/${cert._id}`}
                         className="text-blue-600 hover:text-blue-900"
                         title="View Certificate Details">
                         <FaEye />
                       </Link>
                       <Link
-                        to={`/admin/companies/${companyId}/edit-certification/${cert._id}`}
+                        to={`/companies/${companyId}/edit-certification/${cert._id}`}
                         className="text-green-600 hover:text-green-900"
                         title="Edit Certification">
                         <FaEdit />

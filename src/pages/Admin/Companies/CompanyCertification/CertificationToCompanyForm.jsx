@@ -31,7 +31,6 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
     notes: "",
   });
 
-  const [csrfToken, setCsrfToken] = useState('');
   const [availableCertifications, setAvailableCertifications] = useState([]);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,24 +38,6 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
   const [error, setError] = useState(null);
   const [manualExpiry, setManualExpiry] = useState(false);
   const [selectedCertDuration, setSelectedCertDuration] = useState(null);
-
-
-  useEffect(() => {
-    const fetchCsrfToken = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/api/auth/csrf-token`, {
-          withCredentials: true // Important for cookies
-        });
-        setCsrfToken(response.data.csrfToken);
-      } catch (error) {
-        console.error("Error fetching CSRF token:", error);
-        toast.error("Failed to load security token. Please refresh the page.");
-      }
-    };
-    
-    fetchCsrfToken();
-  }, []);
-
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -106,10 +87,14 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
               notes: certData.notes || "",
             });
 
-            // In edit mode, we consider expiry date as manually set
+            // In edit mode, we consider expiry date as manually set if it exists
             if (certData.expiryDate) {
               setManualExpiry(true);
             }
+
+            // Find selected certification duration
+            const selectedCert = availableCertifications.find(c => c._id === certData.certification._id);
+            setSelectedCertDuration(selectedCert?.durationInMonths || null);
           } else {
             throw new Error("Failed to load certification details");
           }
@@ -128,7 +113,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
     };
 
     fetchInitialData();
-  }, [companyId, certificationId, isEdit]);
+  }, [companyId, certificationId, isEdit, availableCertifications.length]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -141,6 +126,17 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
     if (name === "certification" && value) {
       const selectedCert = availableCertifications.find(c => c._id === value);
       setSelectedCertDuration(selectedCert?.durationInMonths || null);
+      
+      // Auto-calculate expiry if not manually set and we have duration and issue date
+      if (!manualExpiry && selectedCert?.durationInMonths && formData.issueDate) {
+        const calculatedExpiry = new Date(formData.issueDate);
+        calculatedExpiry.setMonth(calculatedExpiry.getMonth() + selectedCert.durationInMonths);
+        calculatedExpiry.setDate(calculatedExpiry.getDate() - 1); // Subtract 1 day
+        setFormData(prev => ({
+          ...prev,
+          expiryDate: calculatedExpiry.toISOString().split("T")[0]
+        }));
+      }
     }
   };
 
@@ -178,28 +174,48 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
 
       const method = isEdit ? "put" : "post";
 
-      // Prepare payload - remove expiryDate if not manually set (let backend calculate)
+      // Prepare payload - only include fields that have values
       const payload = {
-        ...formData,
-        // For new certifications, if certificationId is empty, let the backend generate it
-        certificationId: isEdit ? formData.certificationId : (formData.certificationId || undefined),
-        // Clear expiry date if not manually set (backend will calculate)
-        expiryDate: manualExpiry ? formData.expiryDate : undefined
+        company: formData.company,
+        certification: formData.certification,
+        issueDate: formData.issueDate,
+        status: formData.status,
       };
+
+      // Only include certificationId if it's provided (for edit) or has a value (for create)
+      if (formData.certificationId) {
+        payload.certificationId = formData.certificationId;
+      }
+
+      // Only include expiryDate if manually set
+      if (manualExpiry && formData.expiryDate) {
+        payload.expiryDate = formData.expiryDate;
+      }
+
+      // Include surveillance dates if they have values
+      if (formData.firstSurveillanceDate) {
+        payload.firstSurveillanceDate = formData.firstSurveillanceDate;
+      }
+      if (formData.secondSurveillanceDate) {
+        payload.secondSurveillanceDate = formData.secondSurveillanceDate;
+      }
+
+      // Include notes if provided
+      if (formData.notes.trim()) {
+        payload.notes = formData.notes.trim();
+      }
 
       const response = await axios[method](endpoint, payload, {
         headers: {
-          'CSRF-Token': csrfToken,
           'Content-Type': 'application/json'
-        },
-        withCredentials: true
+        }
       });
 
       if (response.data.success) {
         toast.success(
           `Certification ${isEdit ? "updated" : "added"} successfully`
         );
-        navigate(`/admin/companies/view/${companyId}`);
+        navigate(`/companies/view/${companyId}`);
       } else {
         throw new Error(
           response.data.message ||
@@ -236,7 +252,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
           </h2>
           <p className="text-red-600 mb-4">{error}</p>
           <Link
-            to={`/admin/companies/view/${companyId}`}
+            to={`/companies/view/${companyId}`}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
             Return to Company
           </Link>
@@ -262,7 +278,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
         </div>
 
         <Link
-          to={`/admin/companies/view/${companyId}`}
+          to={`/companies/view/${companyId}`}
           className="px-3 py-2 bg-gray-100 text-gray-700 rounded-md flex items-center hover:bg-gray-200 transition-colors">
           <FaArrowLeft className="mr-1" />
           Back to Company
@@ -289,7 +305,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
           />
           {!isEdit && (
             <p className="text-xs text-gray-500 mt-1">
-              If left blank, a unique ID will be automatically generated (format: FCRT-XXXXXX)
+              If left blank, a unique ID will be automatically generated (format: FCRT-XXXXXXXX)
             </p>
           )}
         </div>
@@ -452,7 +468,7 @@ const CertificationToCompanyForm = ({ isEdit = false }) => {
         {/* Form Actions */}
         <div className="flex justify-end space-x-3 pt-4 border-t">
           <Link
-            to={`/admin/companies/view/${companyId}`}
+            to={`/companies/view/${companyId}`}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
           >
             Cancel

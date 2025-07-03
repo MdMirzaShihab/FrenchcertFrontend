@@ -54,7 +54,7 @@ const CertificationView = () => {
       try {
         await axios.delete(`${BASE_URL}/api/certifications/${id}`);
         toast.success("Certification deleted successfully");
-        navigate("/admin/certifications");
+        navigate("/certifications");
       } catch (error) {
         toast.error(
           error.response?.data?.message || "Failed to delete certification"
@@ -98,7 +98,7 @@ const CertificationView = () => {
               "The certification you're looking for doesn't exist or has been removed."}
           </p>
           <Link
-            to="/admin/certifications"
+            to="/certifications"
             className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
             <FaChevronLeft className="mr-2" /> Back to Certification List
           </Link>
@@ -190,13 +190,13 @@ const CertificationView = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <Link
-          to="/admin/certifications"
+          to="/certifications"
           className="flex items-center text-blue-600 hover:text-blue-800">
           <FaArrowLeft className="mr-2" /> Back to Certification List
         </Link>
         <div className="flex gap-4">
           <Link
-            to={`/admin/certifications/edit/${id}`}
+            to={`/certifications/edit/${id}`}
             className="flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg">
             <FaEdit className="mr-2" /> Edit
           </Link>

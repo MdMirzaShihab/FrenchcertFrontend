@@ -30,7 +30,7 @@ const FieldForm = ({ isEdit = false }) => {
           const errorMsg = error.response?.data?.message || "Failed to fetch field";
           setError(errorMsg);
           toast.error(errorMsg);
-          navigate("/admin/fields", { replace: true });
+          navigate("/fields", { replace: true });
         } finally {
           setLoading(false);
         }
@@ -63,7 +63,7 @@ const FieldForm = ({ isEdit = false }) => {
             ? "Field updated successfully" 
             : "Field created successfully"
         );
-        navigate("/admin/fields");
+        navigate("/fields");
       }
     } catch (error) {
       let errorMessage = "An error occurred";
@@ -147,7 +147,7 @@ const FieldForm = ({ isEdit = false }) => {
         <div className="mt-6 flex justify-end space-x-4">
           <button
             type="button"
-            onClick={() => navigate("/admin/fields")}
+            onClick={() => navigate("/fields")}
             className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50 transition"
             disabled={loading}
           >

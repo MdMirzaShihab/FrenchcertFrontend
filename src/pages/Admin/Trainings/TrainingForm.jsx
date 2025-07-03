@@ -386,7 +386,7 @@ const TrainingForm = ({ isEdit = false }) => {
             ? "Training updated successfully"
             : "Training created successfully"
         );
-        navigate("/admin/trainings");
+        navigate("/trainings");
       }
     } catch (error) {
       const errorMessage =
@@ -572,7 +572,7 @@ const TrainingForm = ({ isEdit = false }) => {
         <div className="mt-6 flex justify-end space-x-4">
           <button
             type="button"
-            onClick={() => navigate("/admin/trainings")}
+            onClick={() => navigate("/trainings")}
             className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100 transition-colors"
             disabled={loading}>
             Cancel

@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { FaPlus, FaSearch, FaEdit, FaTrash, FaEye, FaSpinner } from "react-icons/fa";
+import { FaPlus, FaSearch, FaEdit, FaTrash, FaSpinner, FaEye, FaFileAlt } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { BASE_URL } from "../../../secrets";
 import Pagination from "../../../components/Pagination";
+import { BASE_URL } from "../../../secrets";
 
-const FieldList = () => {
+const PageList = () => {
   const [state, setState] = useState({
-    fields: [],
+    pages: [],
     loading: true,
     searchTerm: '',
     currentPage: 1,
@@ -16,74 +16,69 @@ const FieldList = () => {
     error: null
   });
 
-  const { fields, loading, searchTerm, currentPage, totalPages, error } = state;
+  const { 
+    pages, 
+    loading, 
+    searchTerm, 
+    currentPage, 
+    totalPages, 
+    error 
+  } = state;
 
-  const fetchFields = useCallback(async (page = 1, search = "") => {
+  const fetchPages = useCallback(async (page = 1) => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
-      const response = await axios.get(`${BASE_URL}/api/fields`, {
-        params: {
-          page,
-          limit: 10,
-          search,
-        },
-      });
-
-      if (response.data.success) {
-        setState(prev => ({
-          ...prev,
-          fields: response.data.data.fields || response.data.data.docs || [],
-          currentPage: response.data.data.page || 1,
-          totalPages: response.data.data.pages || 1,
-          loading: false
-        }));
-      }
-    } catch (error) {
-      const errorMsg = error.response?.data?.message || "Failed to fetch fields";
+      
+      const params = {
+        page,
+        limit: 10,
+        ...(searchTerm && { search: searchTerm })
+      };
+  
+      const response = await axios.get(`${BASE_URL}/api/pages`, { params });
+      
+      // Make sure we have the expected structure
+      const responseData = response.data.data;
+      
+      setState(prev => ({
+        ...prev,
+        pages: responseData.docs || [], // Use empty array as fallback
+        totalPages: responseData.pages || 1,
+        currentPage: responseData.page || 1,
+        loading: false
+      }));
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Failed to fetch pages';
       setState(prev => ({ ...prev, loading: false, error: errorMsg }));
       toast.error(errorMsg);
     }
-  }, []);
+  }, [searchTerm]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchFields(1, searchTerm);
+      fetchPages(1);
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, fetchFields]);
+  }, [fetchPages]);
 
-  const handlePageChange = (newPage) => {
-    setState(prev => ({ ...prev, currentPage: newPage }));
-    fetchFields(newPage, searchTerm);
+  const handleResetFilters = () => {
+    setState(prev => ({
+      ...prev,
+      searchTerm: '',
+      currentPage: 1
+    }));
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this field?")) return;
-
-    try {
-      await axios.delete(`${BASE_URL}/api/fields/${id}`);
-      toast.success("Field deleted successfully");
-      fetchFields(currentPage, searchTerm);
-    } catch (error) {
-      let errorMsg = error.response?.data?.message || "Failed to delete field";
-
-      if (error.response?.data?.references) {
-        errorMsg =
-          "Cannot delete: Field is referenced in " +
-          `${
-            error.response.data.references.certifications > 0
-              ? "certifications, "
-              : ""
-          }` +
-          `${
-            error.response.data.references.trainings > 0 ? "trainings, " : ""
-          }` +
-          `${error.response.data.references.companies > 0 ? "companies" : ""}`;
-        errorMsg = errorMsg.replace(/, $/, "");
+    if (window.confirm('Are you sure you want to delete this page?')) {
+      try {
+        await axios.delete(`${BASE_URL}/api/pages/${id}`);
+        toast.success('Page deleted successfully');
+        fetchPages(currentPage);
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to delete page');
       }
-
-      toast.error(errorMsg);
     }
   };
 
@@ -110,19 +105,17 @@ const FieldList = () => {
 
   const EmptyState = () => (
     <div className="bg-white p-8 rounded-lg shadow text-center">
-      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <h3 className="mt-2 text-lg font-medium text-gray-900">No fields found</h3>
+      <FaFileAlt className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+      <h3 className="text-lg font-medium text-gray-900">No pages found</h3>
       <p className="mt-1 text-sm text-gray-500">
-        {searchTerm ? 'Try adjusting your search' : 'Get started by creating a new field'}
+        Try adjusting your search or create a new page.
       </p>
       <div className="mt-6">
         <Link
-          to="/fields/add"
+          to="/pages/add"
           className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          <FaPlus className="mr-2" /> Add Field
+          <FaPlus className="mr-2" /> Create New Page
         </Link>
       </div>
     </div>
@@ -133,28 +126,37 @@ const FieldList = () => {
       <div className="flex flex-col space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <h1 className="text-2xl font-bold text-gray-900">Field Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Page Management</h1>
           <Link
-            to="/fields/add"
+            to="/pages/add"
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            <FaPlus className="mr-2" /> Add Field
+            <FaPlus className="mr-2" /> Add Page
           </Link>
         </div>
 
-        {/* Search */}
+        {/* Filters */}
         <div className="bg-white shadow rounded-lg p-4">
-          <div className="relative rounded-md shadow-sm">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaSearch className="h-4 w-4 text-gray-400" />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="h-4 w-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                placeholder="Search pages..."
+                value={searchTerm}
+                onChange={(e) => setState(prev => ({ ...prev, searchTerm: e.target.value }))}
+              />
             </div>
-            <input
-              type="text"
-              className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
-              placeholder="Search fields by name..."
-              value={searchTerm}
-              onChange={(e) => setState(prev => ({ ...prev, searchTerm: e.target.value }))}
-            />
+
+            <button
+              onClick={handleResetFilters}
+              className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Reset Filters
+            </button>
           </div>
         </div>
 
@@ -164,7 +166,7 @@ const FieldList = () => {
         {/* Content */}
         {loading ? (
           <LoadingSpinner />
-        ) : fields.length === 0 ? (
+        ) : !pages || pages.length === 0 ? ( // Added null check
           <EmptyState />
         ) : (
           <div className="bg-white shadow rounded-lg overflow-hidden">
@@ -173,10 +175,13 @@ const FieldList = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
+                      Title & Slug
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Description
+                      Status
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Navbar
                     </th>
                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
@@ -184,34 +189,54 @@ const FieldList = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {fields.map((field) => (
-                    <tr key={field._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{field.name}</div>
-                      </td>
+                  {pages.map((page) => (
+                    <tr key={page._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-500 line-clamp-2">
-                          {field.description || '-'}
+                        <div className="flex items-center">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{page.title}</div>
+                            <div className="text-sm text-gray-500">
+                              /{page.slug}
+                            </div>
+                          </div>
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          page.isPublished 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {page.isPublished ? 'Published' : 'Draft'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          page.showInNavbar 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {page.showInNavbar ? 'Visible' : 'Hidden'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
                           <Link
-                            to={`/fields/view/${field._id}`}
+                            to={`/pages/view/${page._id}`}
                             className="text-blue-600 hover:text-blue-900"
                             title="View"
                           >
                             <FaEye className="h-5 w-5" />
                           </Link>
                           <Link
-                            to={`/fields/edit/${field._id}`}
+                            to={`/pages/edit/${page._id}`}
                             className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                             title="Edit"
                           >
                             <FaEdit className="h-4 w-4" />
                           </Link>
                           <button
-                            onClick={() => handleDelete(field._id)}
+                            onClick={() => handleDelete(page._id)}
                             className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
                             title="Delete"
                           >
@@ -230,7 +255,10 @@ const FieldList = () => {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPageChange={handlePageChange}
+                onPageChange={(page) => {
+                  setState(prev => ({ ...prev, currentPage: page }));
+                  fetchPages(page);
+                }}
                 className="px-4 py-3 bg-gray-50 border-t border-gray-200"
               />
             )}
@@ -241,4 +269,4 @@ const FieldList = () => {
   );
 };
 
-export default FieldList;
+export default PageList;

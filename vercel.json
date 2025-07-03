@@ -1,47 +1,6 @@
-
-  {
-    "routes": [
-      {
-        "src": "/",
-        "dest": "/"
-      },
-      {
-        "src": "/validat",
-        "dest": "/"
-      },
-      {
-        "src": "/login",
-        "dest": "/"
-      },
-      {
-        "src": "/company-details",
-        "dest": "/"
-      },
-      {
-        "src": "/career",
-        "dest": "/"
-      },
-      {
-        "src": "/services",
-        "dest": "/"
-      },
-      {
-        "src": "/about",
-        "dest": "/"
-      },
-      {
-        "src": "/contact",
-        "dest": "/"
-      },
-      {
-        "src": "/join-us",
-        "dest": "/"
-      },
-      {
-        "src": "/process",
-        "dest": "/"
-      }
-      
-    ]
-    
-  }
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}

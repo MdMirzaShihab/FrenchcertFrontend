@@ -69,7 +69,7 @@ const CompanyForm = () => {
         toast.error(
           error.response?.data?.message || "Failed to load company data"
         );
-        navigate("/admin/companies");
+        navigate("/companies");
       } finally {
         setIsFetching(false);
       }
@@ -170,7 +170,7 @@ const CompanyForm = () => {
         await axios.post(`${BASE_URL}/api/companies`, submitData);
         toast.success("Company created successfully");
       }
-      navigate("/admin/companies");
+      navigate("/companies");
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || error.message || "An error occurred";
@@ -514,7 +514,7 @@ const CompanyForm = () => {
         <div className="flex justify-end space-x-4 mt-8">
           <button
             type="button"
-            onClick={() => navigate("/admin/companies")}
+            onClick={() => navigate("/companies")}
             disabled={isLoading}
             className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md flex items-center hover:bg-gray-50 disabled:opacity-50">
             <FaTimesCircle className="mr-2" /> Cancel
