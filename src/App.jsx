@@ -1,11 +1,13 @@
+// src/App.jsx
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AppRoutes from "./routes/routes";
+import { AuthProvider } from "./context/AuthContext";
 import "./App.css";
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <AppRoutes />
       <ToastContainer
         position="top-right"
@@ -19,7 +21,7 @@ function App() {
         pauseOnHover
         theme="colored"
       />
-    </>
+    </AuthProvider>
   );
 }
 

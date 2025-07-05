@@ -38,11 +38,24 @@ import PageView from "../pages/Admin/NavPages/PageView";
 // Not Found page (you should create this component)
 import NotFound from "../pages/NotFound";
 
+// Auth
+import ProtectedRoute from "../components/ProtectedRoute";
+import Login from "../pages/Login";
+
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Admin layout wrapper */}
-      <Route path="" element={<AdminLayout />}>
+      {/* Login route (unprotected) */}
+      <Route path="/login" element={<Login />} />
+
+      {/* All other routes are protected */}
+      <Route
+        path=""
+        element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
         {/* Dashboard */}
         <Route index element={<AdminDashboard />} />
 

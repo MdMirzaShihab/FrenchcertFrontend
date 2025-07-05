@@ -1,11 +1,14 @@
 import { Outlet, Link } from "react-router-dom";
 import { FaHome, FaBuilding, FaCertificate, FaChalkboardTeacher, FaSignOutAlt, FaClipboardList, FaFileAlt } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const AdminLayout = ({children}) => {
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    logout();
     navigate('/login');
   };
 
