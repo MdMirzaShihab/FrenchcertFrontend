@@ -20,7 +20,7 @@ const AdminLayout = ({children}) => {
         <nav>
           <ul className="space-y-2">
             <li>
-              <Link to="/admin" className="flex items-center p-2 rounded hover:bg-blue-700">
+              <Link to="/" className="flex items-center p-2 rounded hover:bg-blue-700">
                 <FaHome className="mr-2" /> Dashboard
               </Link>
             </li>
